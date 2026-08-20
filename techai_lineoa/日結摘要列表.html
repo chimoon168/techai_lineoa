@@ -92,9 +92,9 @@ table.grid tbody tr:last-child td{border-bottom:none;}
 
       <div class="filter-bar">
         <div class="fld">
-          <label>LINE 群暱稱</label>
-          <select id="groupFilter" onchange="renderList()">
-            <option value="">全部群組</option>
+          <label>指定 LINE 帳號</label>
+          <select id="lineAccountFilter" onchange="renderList()">
+            <option value="">全部帳號</option>
             <option value="小露OA">小露OA</option>
             <option value="全電商管理群">全電商管理群</option>
           </select>
@@ -149,8 +149,8 @@ function populateMonthOptions(){
 
 function renderList(){
   const month = document.getElementById('monthFilter').value;
-  const group = document.getElementById('groupFilter').value;
-  const rows = DIGESTS.filter(r => r.endDate.slice(0,7) === month && (!group || r.group === group))
+  const account = document.getElementById('lineAccountFilter').value;
+  const rows = DIGESTS.filter(r => r.endDate.slice(0,7) === month && (!account || r.group === account))
                        .sort((a,b)=> b.endDate.localeCompare(a.endDate));
   const tbody = document.getElementById('digestTbody');
   tbody.innerHTML = '';
@@ -160,13 +160,13 @@ function renderList(){
   rows.forEach(r=>{
     const tr = document.createElement('tr');
     tr.innerHTML = '<td>'+r.group+'</td><td>'+r.endDate+'</td><td>'+r.createdAt+'</td><td class="chev">›</td>';
-    tr.onclick = ()=>{ location.href = '日結摘要內容.html?id='+encodeURIComponent(r.id)+'&month='+encodeURIComponent(month)+'&group='+encodeURIComponent(group); };
+    tr.onclick = ()=>{ location.href = '日結摘要內容.html?id='+encodeURIComponent(r.id)+'&month='+encodeURIComponent(month)+'&group='+encodeURIComponent(account); };
     tbody.appendChild(tr);
   });
 }
 
-const urlGroup = getParam('group');
-document.getElementById('groupFilter').value = urlGroup || "";
+const urlAccount = getParam('group');
+document.getElementById('lineAccountFilter').value = urlAccount || "";
 populateMonthOptions();
 renderList();
 </script>
