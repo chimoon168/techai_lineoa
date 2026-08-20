@@ -109,7 +109,7 @@ a{text-decoration:none;color:inherit;}
         </div>
 
         <div class="block">
-          <div class="block-title"><span class="dot" style="background:var(--orange);"></span>小露作業說明</div>
+          <div class="block-title"><span class="dot" style="background:var(--orange);"></span>小露AI 作業說明</div>
           <div class="block-body note" id="g_note"></div>
         </div>
 
@@ -156,7 +156,7 @@ const DIGESTS = [
    summary:"今日進度：提案初稿討論完成，聚焦身份綁定與語音摘要兩項能力；OIDC 綁定流程細節與分眾標籤定義已初步規劃。\n待追蹤事項：\n・簡報架構補充現況痛點案例（全員）\n待確認事項：\n・里程碑週次是否需微調？"},
 ];
 
-const DIGEST_NOTE = "本日結彙整由小露於每日 18:00 排程自動彙整當日文字訊息與語音摘要，若有遺漏事項請於群組內補充，系統將於隔日彙整時一併納入；本彙整為 AI 產出，正式進度請以負責人回覆為準。";
+const DIGEST_NOTE = "本日結彙整由小露AI於每日 18:00 排程自動彙整當日文字訊息與語音摘要，若有遺漏事項請於群組內補充，系統將於隔日彙整時一併納入；本彙整為 AI 產出，正式進度請以負責人回覆為準。";
 
 function pad(n){return n<10?"0"+n:""+n;}
 function getParam(name){ return new URLSearchParams(location.search).get(name); }
@@ -198,7 +198,7 @@ if(r){
     downloadAsWord(r.group+'_'+r.endDate+'_日結摘要.doc', r.group+' 日結摘要',
       '<h2>'+r.group+' 日結摘要</h2><p><b>日結時間：</b>'+startStr+' 18:00:00 ～ '+r.endDate+' 17:59:59</p>'+
       '<h3>日結摘要</h3><p style="white-space:pre-wrap;">'+r.summary+'</p>'+
-      '<h3>小露作業說明</h3><p style="white-space:pre-wrap;font-size:12px;color:#7A5A20;">'+DIGEST_NOTE+'</p>');
+      '<h3>小露AI 作業說明</h3><p style="white-space:pre-wrap;font-size:12px;color:#7A5A20;">'+DIGEST_NOTE+'</p>');
   };
 } else {
   document.getElementById('notFound').style.display = 'block';

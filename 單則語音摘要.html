@@ -117,7 +117,7 @@ a{text-decoration:none;color:inherit;}
         </div>
 
         <div class="block">
-          <div class="block-title"><span class="dot" style="background:var(--orange);"></span>小露作業說明</div>
+          <div class="block-title"><span class="dot" style="background:var(--orange);"></span>小露AI 作業說明</div>
           <div class="block-body note" id="d_note"></div>
         </div>
 
@@ -191,7 +191,7 @@ const DAILY_VOICES = [
    transcript:"[00:00] 簡報架構先抓三大段落，現況痛點、能力介紹，最後是里程碑時程。\n[00:26] 大家再幫忙補充一下現況痛點的具體案例。"},
 ];
 
-const DAILY_NOTE = "本內容由小露（AI 語音助理）自動轉錄與摘要：語音轉文字使用 Google Cloud Speech-to-Text，結構化摘要使用 Vertex AI Gemini，送入前已執行敏感資訊遮罩處理。摘要僅供參考、不作為正式決策依據，請負責人以逐字內容確認後執行；原始語音檔將於處理完成後 24 小時內自動清除。";
+const DAILY_NOTE = "本內容由小露AI（AI 語音助理）自動轉錄與摘要：語音轉文字使用 Google Cloud Speech-to-Text，結構化摘要使用 Vertex AI Gemini，送入前已執行敏感資訊遮罩處理。摘要僅供參考、不作為正式決策依據，請負責人以逐字內容確認後執行；原始語音檔將於處理完成後 24 小時內自動清除。";
 
 function getParam(name){ return new URLSearchParams(location.search).get(name); }
 function showToast(msg){
@@ -237,7 +237,7 @@ if(v){
       '<h2>'+v.title+'</h2><p><b>語音檔名：</b>'+v.file+'</p><p><b>語音檔日期時間：</b>'+v.datetime+'</p><p><b>LINE 群暱稱：</b>'+v.group+'</p>'+
       '<h3>語音摘要</h3><p style="white-space:pre-wrap;">'+v.summary+'</p>'+
       '<h3>語音逐字內容</h3><p style="white-space:pre-wrap;">'+v.transcript+'</p>'+
-      '<h3>小露作業說明</h3><p style="white-space:pre-wrap;font-size:12px;color:#7A5A20;">'+DAILY_NOTE+'</p>');
+      '<h3>小露AI 作業說明</h3><p style="white-space:pre-wrap;font-size:12px;color:#7A5A20;">'+DAILY_NOTE+'</p>');
   };
 } else {
   document.getElementById('notFound').style.display = 'block';
