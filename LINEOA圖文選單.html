@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小露AI｜LINEOA圖文選單</title>
+<style>
+:root{
+  --primary:#169BD5; --pink:#DF0870; --green:#2E9E5B;
+  --orange:#E8912D; --red:#D0362C; --text:#333333;
+  --text-sub:#999999; --border:#E3E6EB; --bg:#F4F6F9;
+  --sidebar-bg:#1B2A4A;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;color:var(--text);background:var(--bg);font-size:14px;}
+a{text-decoration:none;color:inherit;}
+
+.app{display:flex;min-height:100vh;}
+.sidebar{width:230px;flex-shrink:0;background:var(--sidebar-bg);color:#fff;display:flex;flex-direction:column;}
+.brand{padding:22px 20px 16px;border-bottom:1px solid rgba(255,255,255,.12);}
+.brand .name{font-size:20px;font-weight:700;letter-spacing:1px;}
+.brand .sub{font-size:11px;color:#9FB0CC;margin-top:4px;}
+.nav{padding:14px 0;flex:1;}
+.nav-group-title{font-size:11px;color:#7C8CAE;padding:6px 20px;letter-spacing:1px;}
+.nav-item{padding:11px 20px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#D8E1F0;border-left:3px solid transparent;}
+.nav-item .ico{font-size:15px;width:18px;text-align:center;}
+.nav-item:hover{background:rgba(255,255,255,.06);}
+.nav-item.active{background:rgba(22,155,213,.18);border-left-color:var(--primary);color:#fff;font-weight:700;}
+.sidebar-footer{padding:14px 20px;font-size:11px;color:#7C8CAE;border-top:1px solid rgba(255,255,255,.12);}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:14px 26px;display:flex;align-items:center;justify-content:space-between;}
+.breadcrumb{font-size:13px;color:var(--text-sub);}
+.breadcrumb b{color:var(--text);font-weight:700;}
+.user-menu{position:relative;}
+.user-chip{font-size:13px;color:var(--text-sub);cursor:pointer;display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:6px;}
+.user-chip:hover{background:#F4F6F9;}
+.user-chip .chevron{font-size:10px;transition:transform .15s;}
+.user-menu.open .user-chip .chevron{transform:rotate(180deg);}
+.user-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:140px;padding:6px;display:none;z-index:40;}
+.user-menu.open .user-dropdown{display:block;}
+.user-dropdown-item{padding:9px 12px;font-size:13px;color:var(--text);border-radius:5px;cursor:pointer;display:flex;align-items:center;gap:8px;}
+.user-dropdown-item:hover{background:#F4F6F9;color:var(--red);}
+.content{padding:22px 26px;flex:1;}
+
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:20px;}
+.page-title{font-size:19px;font-weight:700;}
+.page-desc{font-size:12px;color:var(--text-sub);margin-top:4px;}
+
+.primary-btn{background:var(--primary);color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.primary-btn:hover{background:#1287bc;}
+.ghost-btn{background:#fff;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 16px;font-size:13px;cursor:pointer;}
+.ghost-btn:hover{border-color:var(--primary);color:var(--primary);}
+.small-btn{display:inline-block;font-size:12px;border:1px solid var(--border);border-radius:5px;padding:4px 11px;cursor:pointer;background:#fff;margin-right:6px;}
+.small-btn.blue{border-color:var(--primary);color:var(--primary);}
+.small-btn.red{border-color:var(--red);color:var(--red);}
+
+.result-count{display:flex;align-items:center;gap:14px;font-size:13px;color:var(--text-sub);margin-bottom:10px;}
+.result-count b{color:var(--text);}
+table.grid{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+table.grid thead th{background:#F7F9FC;color:var(--text-sub);font-size:12px;font-weight:700;text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);}
+table.grid tbody td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+table.grid tbody tr:last-child td{border-bottom:none;}
+.empty-state{padding:60px 0;text-align:center;color:var(--text-sub);font-size:13px;background:#fff;border:1px solid var(--border);border-radius:8px;}
+.empty-state .big{font-size:30px;margin-bottom:8px;}
+
+.thumb{width:64px;height:40px;border-radius:5px;border:1px solid var(--border);object-fit:cover;display:block;background:#F4F6F9;}
+
+.status-toggle{display:inline-flex;align-items:center;gap:7px;cursor:pointer;user-select:none;}
+.status-dot{width:9px;height:9px;border-radius:50%;background:var(--text-sub);}
+.status-toggle.on .status-dot{background:var(--green);}
+.status-toggle .status-label{font-size:12.5px;color:var(--text-sub);}
+.status-toggle.on .status-label{color:var(--green);font-weight:700;}
+
+.bind-select{border:1px solid var(--border);border-radius:14px;padding:5px 10px;font-size:12.5px;font-weight:700;background:#fff;cursor:pointer;min-width:130px;}
+.bind-select:focus{outline:none;}
+.bind-未綁定{color:var(--text-sub);border-color:var(--border);}
+.bind-已綁定-採購{color:var(--primary);border-color:var(--primary);}
+.bind-已綁定-商企{color:var(--green);border-color:var(--green);}
+.bind-已綁定-廠服{color:var(--orange);border-color:var(--orange);}
+.bind-已綁定-其他{color:var(--pink);border-color:var(--pink);}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(20,30,50,.45);display:none;align-items:center;justify-content:center;z-index:60;}
+.modal-overlay.show{display:flex;}
+.modal-card{background:#fff;border-radius:10px;width:460px;max-width:92vw;max-height:88vh;overflow-y:auto;padding:26px 28px;}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+.modal-desc{font-size:12px;color:var(--text-sub);margin-bottom:20px;}
+.fld{margin-bottom:16px;display:flex;flex-direction:column;gap:6px;}
+.fld label{font-size:12px;color:var(--text-sub);font-weight:700;}
+.fld input[type=text], .fld select{
+  border:1px solid var(--border);border-radius:6px;padding:9px 11px;font-size:14px;color:var(--text);background:#fff;width:100%;
+}
+.fld input[type=text]:focus, .fld select:focus{outline:none;border-color:var(--primary);}
+.upload-box{border:1.5px dashed var(--border);border-radius:8px;padding:16px;text-align:center;cursor:pointer;color:var(--text-sub);font-size:12.5px;line-height:1.7;}
+.upload-box:hover{border-color:var(--primary);color:var(--primary);}
+.upload-preview{max-width:100%;max-height:120px;border-radius:6px;margin-bottom:8px;display:none;}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
+.err-inline{display:none;color:var(--red);font-size:12px;margin-top:-8px;margin-bottom:14px;}
+.err-inline.show{display:block;}
+
+.toast{position:fixed;bottom:26px;right:26px;background:#1B2A4A;color:#fff;padding:12px 18px;border-radius:8px;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,.18);opacity:0;transform:translateY(8px);transition:all .25s;z-index:70;display:flex;align-items:center;gap:14px;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast .undo{color:#7CD0F7;font-weight:700;cursor:pointer;white-space:nowrap;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="brand">
+      <div class="name">🎙️ 小露AI</div>
+      <div class="sub">LINE 語音智能助理・技術處辦公室自動化</div>
+    </div>
+    <div class="nav">
+      <div class="nav-group-title">小露AI</div>
+      <a class="nav-item" href="每日語音列表.html"><span class="ico">📅</span>每日語音</a>
+      <a class="nav-item" href="日結摘要列表.html"><span class="ico">🗂️</span>日結摘要</a>
+      <a class="nav-item active" href="LINEOA圖文選單.html"><span class="ico">🖼️</span>LINEOA圖文選單</a>
+    </div>
+    <div class="sidebar-footer">開發畫面原型 v0.5<br>LINEOA 圖文選單（Rich Menu）管理</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="breadcrumb">小露AI &nbsp;›&nbsp; <b>LINEOA圖文選單</b></div>
+      <div class="user-menu" id="userMenu">
+        <div class="user-chip" onclick="toggleUserMenu(event)">Chimoon（PXEC）<span class="chevron">▾</span></div>
+        <div class="user-dropdown">
+          <div class="user-dropdown-item" onclick="doLogout()">🚪 登出</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="page-head">
+        <div>
+          <div class="page-title">LINEOA 圖文選單管理</div>
+          <div class="page-desc">管理 LINE 官方帳號圖文選單（Rich Menu），並設定各選單綁定的身份別；依身份別將不同圖文選單指派給對應使用者</div>
+        </div>
+        <button class="primary-btn" onclick="openModal()">＋ 新增圖文選單</button>
+      </div>
+
+      <div class="result-count"><span>共 <b id="menuCount">0</b> 個圖文選單</span></div>
+      <table class="grid" id="menuTable">
+        <thead>
+          <tr>
+            <th style="width:84px;">縮圖</th>
+            <th>選單名稱</th>
+            <th style="width:150px;">綁定身份</th>
+            <th style="width:110px;">狀態</th>
+            <th style="width:170px;">建立時間</th>
+            <th style="width:130px;">操作</th>
+          </tr>
+        </thead>
+        <tbody id="menuTbody"></tbody>
+      </table>
+      <div class="empty-state" id="menuEmpty" style="display:none;">
+        <div class="big">🖼️</div>尚未建立任何圖文選單
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal：新增／編輯圖文選單 -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-card">
+    <div class="modal-title" id="modalTitle">新增圖文選單</div>
+    <div class="modal-desc">設定圖文選單名稱、上傳選單圖片，並指定此選單綁定的身份別</div>
+
+    <div class="fld">
+      <label>選單名稱</label>
+      <input type="text" id="f_name" placeholder="例如：採購同仁選單">
+    </div>
+    <div class="err-inline" id="f_nameErr">請輸入選單名稱</div>
+
+    <div class="fld">
+      <label>圖文選單圖片</label>
+      <img class="upload-preview" id="uploadPreview">
+      <div class="upload-box" onclick="document.getElementById('f_image').click()">
+        📤 點擊上傳圖文選單圖片<br>建議尺寸 2500 x 1686 或 2500 x 843
+      </div>
+      <input type="file" id="f_image" accept="image/*" style="display:none;" onchange="onImageSelected(event)">
+    </div>
+
+    <div class="fld">
+      <label>綁定身份</label>
+      <select id="f_bind">
+        <option value="未綁定">未綁定</option>
+        <option value="已綁定-採購">已綁定-採購</option>
+        <option value="已綁定-商企">已綁定-商企</option>
+        <option value="已綁定-廠服">已綁定-廠服</option>
+        <option value="已綁定-其他">已綁定-其他</option>
+      </select>
+    </div>
+
+    <div class="fld">
+      <label>狀態</label>
+      <div class="status-toggle on" id="f_statusToggle" onclick="toggleStatus()">
+        <span class="status-dot"></span>
+        <span class="status-label">啟用</span>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal()">取消</button>
+      <button class="primary-btn" onclick="saveMenu()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span><span class="undo" id="toastUndo" style="display:none;">復原</span></div>
+
+<script>
+/* 共用：右上角使用者選單（登出） */
+function toggleUserMenu(e){
+  e.stopPropagation();
+  document.getElementById('userMenu').classList.toggle('open');
+}
+document.addEventListener('click', function(e){
+  const menu = document.getElementById('userMenu');
+  if(menu && !menu.contains(e.target)) menu.classList.remove('open');
+});
+function doLogout(){ location.href = 'index.html'; }
+
+/* Mock 資料：LINEOA 圖文選單清單，綁定身份對照使用者組織內部人員類別 */
+let MENUS = [
+  {id:"rm1", name:"預設歡迎選單", bind:"未綁定", status:true, createdAt:"2026-07-20 09:00:00", image:null},
+  {id:"rm2", name:"採購同仁選單", bind:"已綁定-採購", status:true, createdAt:"2026-07-25 10:30:00", image:null},
+  {id:"rm3", name:"商品企劃選單", bind:"已綁定-商企", status:true, createdAt:"2026-08-01 14:00:00", image:null},
+  {id:"rm4", name:"廠商服務選單", bind:"已綁定-廠服", status:false, createdAt:"2026-08-05 11:15:00", image:null},
+  {id:"rm5", name:"其他人員選單", bind:"已綁定-其他", status:true, createdAt:"2026-08-10 16:45:00", image:null},
+];
+let nextIdNum = 6;
+let editingId = null;
+let lastDeleted = null;
+let lastDeletedIndex = null;
+
+const BIND_COLORS = {
+  "未綁定":"#999999", "已綁定-採購":"#169BD5", "已綁定-商企":"#2E9E5B",
+  "已綁定-廠服":"#E8912D", "已綁定-其他":"#DF0870"
+};
+
+function pad(n){return n<10?"0"+n:""+n;}
+function nowStr(){
+  const d = new Date(2026,7,17,15,0,0); // 固定示範「現在」：2026-08-17 15:00:00
+  return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+" "+pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds());
+}
+
+function placeholderThumb(name, bind){
+  const color = BIND_COLORS[bind] || "#999999";
+  const initial = (name || "選單").slice(0,1);
+  const svg = "<svg xmlns='http://www.w3.org/2000/svg' width='120' height='75'>"+
+    "<rect width='120' height='75' fill='#F4F6F9'/>"+
+    "<rect x='3' y='3' width='56' height='33' rx='3' fill='"+color+"' fill-opacity='0.18' stroke='"+color+"'/>"+
+    "<rect x='61' y='3' width='56' height='33' rx='3' fill='"+color+"' fill-opacity='0.12' stroke='"+color+"'/>"+
+    "<rect x='3' y='39' width='56' height='33' rx='3' fill='"+color+"' fill-opacity='0.12' stroke='"+color+"'/>"+
+    "<rect x='61' y='39' width='56' height='33' rx='3' fill='"+color+"' fill-opacity='0.18' stroke='"+color+"'/>"+
+    "<text x='60' y='45' font-size='22' font-family='Arial' font-weight='700' fill='"+color+"' text-anchor='middle'>"+initial+"</text>"+
+    "</svg>";
+  return "data:image/svg+xml;utf8,"+encodeURIComponent(svg);
+}
+
+function showToast(msg, undoFn){
+  const t = document.getElementById('toast');
+  const undo = document.getElementById('toastUndo');
+  document.getElementById('toastMsg').textContent = msg;
+  if(undoFn){
+    undo.style.display = 'inline';
+    undo.onclick = ()=>{ undoFn(); t.classList.remove('show'); };
+  } else {
+    undo.style.display = 'none';
+  }
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 4000);
+}
+
+function renderTable(){
+  const tbody = document.getElementById('menuTbody');
+  tbody.innerHTML = '';
+  document.getElementById('menuCount').textContent = MENUS.length;
+  document.getElementById('menuEmpty').style.display = MENUS.length ? 'none' : 'block';
+  document.getElementById('menuTable').style.display = MENUS.length ? 'table' : 'none';
+
+  MENUS.forEach((m, idx)=>{
+    const tr = document.createElement('tr');
+    const thumbSrc = m.image || placeholderThumb(m.name, m.bind);
+    tr.innerHTML =
+      '<td><img class="thumb" src="'+thumbSrc+'"></td>'+
+      '<td>'+m.name+'</td>'+
+      '<td>'+bindSelectHtml(m.id, m.bind)+'</td>'+
+      '<td>'+statusToggleHtml(m.id, m.status)+'</td>'+
+      '<td>'+m.createdAt+'</td>'+
+      '<td><span class="small-btn blue" onclick="editMenu(\''+m.id+'\')">編輯</span><span class="small-btn red" onclick="deleteMenu(\''+m.id+'\')">刪除</span></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function bindSelectHtml(id, current){
+  const opts = ["未綁定","已綁定-採購","已綁定-商企","已綁定-廠服","已綁定-其他"];
+  let html = '<select class="bind-select bind-'+current+'" onchange="onInlineBindChange(\''+id+'\', this)">';
+  opts.forEach(o=>{
+    html += '<option value="'+o+'"'+(o===current?' selected':'')+'>'+o+'</option>';
+  });
+  html += '</select>';
+  return html;
+}
+function onInlineBindChange(id, selectEl){
+  const m = MENUS.find(x=>x.id===id);
+  if(!m) return;
+  const old = m.bind;
+  m.bind = selectEl.value;
+  selectEl.className = 'bind-select bind-'+m.bind;
+  showToast('已將「'+m.name+'」綁定身份改為「'+m.bind+'」', ()=>{ m.bind = old; renderTable(); });
+}
+
+function statusToggleHtml(id, status){
+  return '<div class="status-toggle'+(status?' on':'')+'" onclick="toggleRowStatus(\''+id+'\')">'+
+    '<span class="status-dot"></span><span class="status-label">'+(status?'啟用':'停用')+'</span></div>';
+}
+function toggleRowStatus(id){
+  const m = MENUS.find(x=>x.id===id);
+  if(!m) return;
+  m.status = !m.status;
+  renderTable();
+}
+
+function openModal(){
+  editingId = null;
+  document.getElementById('modalTitle').textContent = '新增圖文選單';
+  document.getElementById('f_name').value = '';
+  document.getElementById('f_bind').value = '未綁定';
+  document.getElementById('f_nameErr').classList.remove('show');
+  document.getElementById('uploadPreview').style.display = 'none';
+  document.getElementById('uploadPreview').src = '';
+  document.getElementById('f_image').value = '';
+  setStatusToggle(true);
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function editMenu(id){
+  const m = MENUS.find(x=>x.id===id);
+  if(!m) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = '編輯圖文選單';
+  document.getElementById('f_name').value = m.name;
+  document.getElementById('f_bind').value = m.bind;
+  document.getElementById('f_nameErr').classList.remove('show');
+  const preview = document.getElementById('uploadPreview');
+  if(m.image){ preview.src = m.image; preview.style.display = 'block'; }
+  else { preview.style.display = 'none'; preview.src=''; }
+  document.getElementById('f_image').value = '';
+  setStatusToggle(m.status);
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+function setStatusToggle(on){
+  const el = document.getElementById('f_statusToggle');
+  el.classList.toggle('on', on);
+  el.querySelector('.status-label').textContent = on ? '啟用' : '停用';
+}
+function toggleStatus(){
+  const el = document.getElementById('f_statusToggle');
+  setStatusToggle(!el.classList.contains('on'));
+}
+function onImageSelected(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const preview = document.getElementById('uploadPreview');
+    preview.src = ev.target.result;
+    preview.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveMenu(){
+  const name = document.getElementById('f_name').value.trim();
+  const errEl = document.getElementById('f_nameErr');
+  if(!name){ errEl.classList.add('show'); return; }
+  errEl.classList.remove('show');
+  const bind = document.getElementById('f_bind').value;
+  const status = document.getElementById('f_statusToggle').classList.contains('on');
+  const preview = document.getElementById('uploadPreview');
+  const image = preview.style.display !== 'none' && preview.src ? preview.src : null;
+
+  if(editingId){
+    const m = MENUS.find(x=>x.id===editingId);
+    m.name = name; m.bind = bind; m.status = status; if(image) m.image = image;
+    showToast('已更新圖文選單「'+name+'」');
+  } else {
+    const newMenu = {id:"rm"+(nextIdNum++), name, bind, status, createdAt: nowStr(), image};
+    MENUS.unshift(newMenu);
+    showToast('已新增圖文選單「'+name+'」');
+  }
+  closeModal();
+  renderTable();
+}
+
+function deleteMenu(id){
+  const idx = MENUS.findIndex(x=>x.id===id);
+  if(idx===-1) return;
+  lastDeleted = MENUS[idx];
+  lastDeletedIndex = idx;
+  const name = lastDeleted.name;
+  MENUS.splice(idx,1);
+  renderTable();
+  showToast('已刪除「'+name+'」', ()=>{
+    MENUS.splice(lastDeletedIndex, 0, lastDeleted);
+    renderTable();
+  });
+}
+
+renderTable();
+</script>
+</body>
+</html>

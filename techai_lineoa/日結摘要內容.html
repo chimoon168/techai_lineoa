@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>語音小露｜日結摘要內容</title>
+<style>
+:root{
+  --primary:#169BD5; --pink:#DF0870; --green:#2E9E5B;
+  --orange:#E8912D; --red:#D0362C; --text:#333333;
+  --text-sub:#999999; --border:#E3E6EB; --bg:#F4F6F9;
+  --sidebar-bg:#1B2A4A;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;color:var(--text);background:var(--bg);font-size:14px;}
+a{text-decoration:none;color:inherit;}
+
+.app{display:flex;min-height:100vh;}
+.sidebar{width:230px;flex-shrink:0;background:var(--sidebar-bg);color:#fff;display:flex;flex-direction:column;}
+.brand{padding:22px 20px 16px;border-bottom:1px solid rgba(255,255,255,.12);}
+.brand .name{font-size:20px;font-weight:700;letter-spacing:1px;}
+.brand .sub{font-size:11px;color:#9FB0CC;margin-top:4px;}
+.nav{padding:14px 0;flex:1;}
+.nav-group-title{font-size:11px;color:#7C8CAE;padding:6px 20px;letter-spacing:1px;}
+.nav-item{padding:11px 20px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#D8E1F0;border-left:3px solid transparent;}
+.nav-item .ico{font-size:15px;width:18px;text-align:center;}
+.nav-item:hover{background:rgba(255,255,255,.06);}
+.nav-item.active{background:rgba(22,155,213,.18);border-left-color:var(--primary);color:#fff;font-weight:700;}
+.sidebar-footer{padding:14px 20px;font-size:11px;color:#7C8CAE;border-top:1px solid rgba(255,255,255,.12);}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:14px 26px;display:flex;align-items:center;justify-content:space-between;}
+.breadcrumb{font-size:13px;color:var(--text-sub);}
+.breadcrumb b{color:var(--text);font-weight:700;}
+.user-chip{font-size:13px;color:var(--text-sub);}
+.content{padding:22px 26px;flex:1;}
+
+.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--primary);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px;}
+.back-link:hover{text-decoration:underline;}
+
+.detail-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:26px 30px;}
+.detail-meta{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--border);}
+.detail-meta .m-fld label{display:block;font-size:11px;color:var(--text-sub);margin-bottom:5px;}
+.detail-meta .m-fld .v{font-size:14px;font-weight:700;color:var(--text);}
+.block{margin-bottom:22px;}
+.block-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.block-title .dot{width:6px;height:6px;border-radius:50%;background:var(--primary);}
+.block-body{font-size:13.5px;line-height:1.9;color:var(--text);background:#F9FBFD;border:1px solid var(--border);border-radius:6px;padding:14px 16px;white-space:pre-wrap;}
+.block-body.note{background:#FFF9EE;border-color:#F2E2C0;color:#7A5A20;font-size:12.5px;}
+.detail-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
+.ghost-btn{background:#fff;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 18px;font-size:14px;cursor:pointer;}
+.ghost-btn:hover{border-color:var(--primary);color:var(--primary);}
+.primary-btn{background:var(--primary);color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:14px;font-weight:700;cursor:pointer;}
+.primary-btn:hover{background:#1287bc;}
+.toast{position:fixed;bottom:26px;right:26px;background:#1B2A4A;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,.18);opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:50;}
+.toast.show{opacity:1;transform:translateY(0);}
+.empty-state{padding:60px 0;text-align:center;color:var(--text-sub);font-size:13px;background:#fff;border:1px solid var(--border);border-radius:8px;}
+.empty-state .big{font-size:30px;margin-bottom:8px;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="brand">
+      <div class="name">🎙️ 語音小露</div>
+      <div class="sub">LINE 語音智能助理・技術處辦公室自動化</div>
+    </div>
+    <div class="nav">
+      <div class="nav-group-title">語音小露</div>
+      <a class="nav-item" href="每日語音列表.html"><span class="ico">📅</span>每日語音</a>
+      <a class="nav-item active" href="日結摘要列表.html"><span class="ico">🗂️</span>日結摘要</a>
+    </div>
+    <div class="sidebar-footer">開發畫面原型 v0.2<br>對應功能二：語音訊息分析摘要</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="breadcrumb">語音小露 &nbsp;›&nbsp; 日結摘要 &nbsp;›&nbsp; <b>日結摘要內容</b></div>
+      <div class="user-chip">Chimoon（PXEC）</div>
+    </div>
+
+    <div class="content">
+      <div class="back-link" id="backLink">← 回到日結摘要列表</div>
+
+      <div id="detailWrap" class="detail-card" style="display:none;">
+        <div class="detail-meta">
+          <div class="m-fld"><label>LINE 群暱稱</label><div class="v" id="g_group">-</div></div>
+          <div class="m-fld"><label>日結時間</label><div class="v" id="g_range">-</div></div>
+        </div>
+
+        <div class="block">
+          <div class="block-title"><span class="dot"></span>日結摘要</div>
+          <div class="block-body" id="g_summary"></div>
+        </div>
+
+        <div class="block">
+          <div class="block-title"><span class="dot" style="background:var(--orange);"></span>小露作業說明</div>
+          <div class="block-body note" id="g_note"></div>
+        </div>
+
+        <div class="detail-actions">
+          <button class="ghost-btn" id="backBtn2">返回列表</button>
+          <button class="primary-btn" id="g_downloadBtn">⬇ 轉存 WORD 下載</button>
+        </div>
+      </div>
+
+      <div class="empty-state" id="notFound" style="display:none;">
+        <div class="big">🔍</div>找不到對應的日結摘要，可能連結已失效
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* 與「日結摘要列表.html」共用同一組 mock 資料（正式串接後改為呼叫 API） */
+const DIGESTS = [
+  {id:"dg1", group:"全電商管理群", endDate:"2026-08-16", createdAt:"2026-08-17 08:02:11",
+   summary:"今日進度：商品標籤母表欄位確認完成，進入定版流程；批次提報異常 3 筆已由品保複核完畢。\n待追蹤事項：\n・NN 特殊流程對焦（Winnie，待確認完成時間）\n・QE 回歸測試報告（QE 組，明日 17:00 前）\n待確認事項：\n・母表欄位確認是否代表正式定版？\n・異常商品複核結果是否需另行通知全電商窗口？"},
+  {id:"dg2", group:"小露OA", endDate:"2026-08-16", createdAt:"2026-08-17 08:02:15",
+   summary:"今日進度：完成語音樣本收集與轉錄測試，摘要準確率符合預期。\n待追蹤事項：\n・持續蒐集不同口音樣本（技術處）\n待確認事項：\n・專有名詞辨識準確率是否需再優化？"},
+  {id:"dg3", group:"全電商管理群", endDate:"2026-08-15", createdAt:"2026-08-16 08:01:47",
+   summary:"今日進度：飾品、髮束、邊夾三張母表核對完成，金銀飾類待補第二張選項。\n待追蹤事項：\n・金銀飾類第二張母表選項（設計組）\n待確認事項：\n・定版後是否需通知全電商窗口？"},
+  {id:"dg4", group:"小露OA", endDate:"2026-08-15", createdAt:"2026-08-16 08:01:52",
+   summary:"今日進度：各項對焦事項完成，準備進入 QE 回歸測試階段。\n待追蹤事項：\n・回歸測試排程確認（QE 組）\n待確認事項：\n・測試如發現問題是否延後母表定版時程？"},
+  {id:"dg5", group:"全電商管理群", endDate:"2026-07-23", createdAt:"2026-07-24 08:03:02",
+   summary:"今日進度：完成母表欄位需求訪談，蒐集三組使用情境。\n待追蹤事項：\n・需求文件彙整（PM，週會前）\n待確認事項：\n・訪談情境是否需要再補充？"},
+  {id:"dg6", group:"小露OA", endDate:"2026-07-22", createdAt:"2026-07-23 08:02:47",
+   summary:"今日進度：提案初稿討論完成，聚焦身份綁定與語音摘要兩項能力；OIDC 綁定流程細節與分眾標籤定義已初步規劃。\n待追蹤事項：\n・簡報架構補充現況痛點案例（全員）\n待確認事項：\n・里程碑週次是否需微調？"},
+];
+
+const DIGEST_NOTE = "本日結彙整由小露於每日 18:00 排程自動彙整當日文字訊息與語音摘要，若有遺漏事項請於群組內補充，系統將於隔日彙整時一併納入；本彙整為 AI 產出，正式進度請以負責人回覆為準。";
+
+function pad(n){return n<10?"0"+n:""+n;}
+function getParam(name){ return new URLSearchParams(location.search).get(name); }
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+function downloadAsWord(filename, title, bodyHtml){
+  const html = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>"+
+    "<head><meta charset='utf-8'><title>"+title+"</title></head><body>"+bodyHtml+"</body></html>";
+  const blob = new Blob(['﻿', html], {type:'application/msword'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast("已產生 WORD 文件：" + filename);
+}
+
+const id = getParam('id');
+const month = getParam('month');
+const group = getParam('group');
+const backHref = '日結摘要列表.html?month='+encodeURIComponent(month||'')+'&group='+encodeURIComponent(group||'');
+document.getElementById('backLink').onclick = ()=>{ location.href = backHref; };
+
+const r = DIGESTS.find(x => x.id === id);
+if(r){
+  document.getElementById('detailWrap').style.display = 'block';
+  document.getElementById('g_group').textContent = r.group;
+  const prevDay = new Date(r.endDate+'T00:00:00'); prevDay.setDate(prevDay.getDate()-1);
+  const startStr = prevDay.getFullYear()+"-"+pad(prevDay.getMonth()+1)+"-"+pad(prevDay.getDate());
+  document.getElementById('g_range').textContent = startStr+' 18:00:00 ～ '+r.endDate+' 17:59:59';
+  document.getElementById('g_summary').textContent = r.summary;
+  document.getElementById('g_note').textContent = DIGEST_NOTE;
+  document.getElementById('backBtn2').onclick = ()=>{ location.href = backHref; };
+  document.getElementById('g_downloadBtn').onclick = ()=>{
+    downloadAsWord(r.group+'_'+r.endDate+'_日結摘要.doc', r.group+' 日結摘要',
+      '<h2>'+r.group+' 日結摘要</h2><p><b>日結時間：</b>'+startStr+' 18:00:00 ～ '+r.endDate+' 17:59:59</p>'+
+      '<h3>日結摘要</h3><p style="white-space:pre-wrap;">'+r.summary+'</p>'+
+      '<h3>小露作業說明</h3><p style="white-space:pre-wrap;font-size:12px;color:#7A5A20;">'+DIGEST_NOTE+'</p>');
+  };
+} else {
+  document.getElementById('notFound').style.display = 'block';
+}
+</script>
+</body>
+</html>

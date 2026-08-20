@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>語音小露｜每日語音列表</title>
+<style>
+:root{
+  --primary:#169BD5; --pink:#DF0870; --green:#2E9E5B;
+  --orange:#E8912D; --red:#D0362C; --text:#333333;
+  --text-sub:#999999; --border:#E3E6EB; --bg:#F4F6F9;
+  --sidebar-bg:#1B2A4A;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;color:var(--text);background:var(--bg);font-size:14px;}
+a{text-decoration:none;color:inherit;}
+
+.app{display:flex;min-height:100vh;}
+.sidebar{width:230px;flex-shrink:0;background:var(--sidebar-bg);color:#fff;display:flex;flex-direction:column;}
+.brand{padding:22px 20px 16px;border-bottom:1px solid rgba(255,255,255,.12);}
+.brand .name{font-size:20px;font-weight:700;letter-spacing:1px;}
+.brand .sub{font-size:11px;color:#9FB0CC;margin-top:4px;}
+.nav{padding:14px 0;flex:1;}
+.nav-group-title{font-size:11px;color:#7C8CAE;padding:6px 20px;letter-spacing:1px;}
+.nav-item{padding:11px 20px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#D8E1F0;border-left:3px solid transparent;}
+.nav-item .ico{font-size:15px;width:18px;text-align:center;}
+.nav-item:hover{background:rgba(255,255,255,.06);}
+.nav-item.active{background:rgba(22,155,213,.18);border-left-color:var(--primary);color:#fff;font-weight:700;}
+.sidebar-footer{padding:14px 20px;font-size:11px;color:#7C8CAE;border-top:1px solid rgba(255,255,255,.12);}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:14px 26px;display:flex;align-items:center;justify-content:space-between;}
+.breadcrumb{font-size:13px;color:var(--text-sub);}
+.breadcrumb b{color:var(--text);font-weight:700;}
+.user-chip{font-size:13px;color:var(--text-sub);}
+.content{padding:22px 26px;flex:1;}
+
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.page-title{font-size:19px;font-weight:700;}
+.page-desc{font-size:12px;color:var(--text-sub);margin-top:4px;}
+
+.filter-bar{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 18px;display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:16px;}
+.fld{display:flex;flex-direction:column;gap:6px;}
+.fld label{font-size:12px;color:var(--text-sub);}
+.fld input[type=date], .fld select{
+  border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:14px;color:var(--text);background:#fff;min-width:160px;
+}
+.fld input[type=date]:focus, .fld select:focus{outline:none;border-color:var(--primary);}
+
+.ghost-btn{background:#fff;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 18px;font-size:14px;cursor:pointer;}
+.ghost-btn:hover{border-color:var(--primary);color:var(--primary);}
+
+.result-count{display:flex;align-items:center;gap:14px;font-size:13px;color:var(--text-sub);margin-bottom:10px;}
+.result-count b{color:var(--text);}
+table.grid{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+table.grid thead th{background:#F7F9FC;color:var(--text-sub);font-size:12px;font-weight:700;text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);}
+table.grid tbody td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+table.grid tbody tr{cursor:pointer;transition:background .12s;}
+table.grid tbody tr:hover{background:#F0F8FC;}
+table.grid tbody tr:last-child td{border-bottom:none;}
+.chev{color:var(--text-sub);font-size:12px;}
+.empty-state{padding:60px 0;text-align:center;color:var(--text-sub);font-size:13px;background:#fff;border:1px solid var(--border);border-radius:8px;}
+.empty-state .big{font-size:30px;margin-bottom:8px;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="brand">
+      <div class="name">🎙️ 語音小露</div>
+      <div class="sub">LINE 語音智能助理・技術處辦公室自動化</div>
+    </div>
+    <div class="nav">
+      <div class="nav-group-title">語音小露</div>
+      <a class="nav-item active" href="每日語音列表.html"><span class="ico">📅</span>每日語音</a>
+      <a class="nav-item" href="日結摘要列表.html"><span class="ico">🗂️</span>日結摘要</a>
+    </div>
+    <div class="sidebar-footer">開發畫面原型 v0.2<br>對應功能二：語音訊息分析摘要</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="breadcrumb">語音小露 &nbsp;›&nbsp; <b>每日語音</b></div>
+      <div class="user-chip">Chimoon（PXEC）</div>
+    </div>
+
+    <div class="content">
+      <div class="page-head">
+        <div>
+          <div class="page-title">每日語音列表</div>
+          <div class="page-desc">預設顯示今日語音紀錄，點選列表可進入單則語音摘要</div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="fld">
+          <label>萬年曆（查詢日期）</label>
+          <input type="date" id="dailyDate" onchange="onDateChange()">
+        </div>
+        <button class="ghost-btn" onclick="jumpToday()">回到今日</button>
+      </div>
+
+      <div class="result-count"><span>查詢結果（共 <b id="dailyCount">0</b> 筆）</span></div>
+      <table class="grid" id="dailyTable">
+        <thead>
+          <tr><th style="width:60px;">#</th><th>LINE 群暱稱</th><th style="width:170px;">語音檔時間</th><th>語音標題（AI 整理）</th><th style="width:36px;"></th></tr>
+        </thead>
+        <tbody id="dailyTbody"></tbody>
+      </table>
+      <div class="empty-state" id="dailyEmpty" style="display:none;">
+        <div class="big">🗓️</div>本日尚無語音訊息紀錄
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* 語音檔名取自實際專案「語音檔」資料夾內既有檔案，日期時間為示意用途；LINE 群暱稱僅示意「小露OA」「全電商管理群」兩個試辦群組 */
+const DAILY_VOICES = [
+  {id:"voice_501120", file:"voice_501120.aac", datetime:"2026-08-17 09:15:32", group:"全電商管理群", title:"商品標籤母表最新進度回報"},
+  {id:"voice_501133", file:"voice_501133.aac", datetime:"2026-08-17 10:42:07", group:"全電商管理群", title:"批次提報異常案例討論"},
+  {id:"voice_501150", file:"voice_501150.aac", datetime:"2026-08-17 14:05:51", group:"小露OA", title:"母表定版前最後確認事項"},
+  {id:"voice_501162", file:"voice_501162.aac", datetime:"2026-08-17 17:38:12", group:"全電商管理群", title:"明日 QE 回歸測試排程與收尾"},
+
+  {id:"voice_472499", file:"voice_472499.aac", datetime:"2026-08-07 10:50:18", group:"小露OA", title:"語音小露 Demo 錄音收集（測試批次一）"},
+  {id:"voice_471392", file:"voice_471392.aac", datetime:"2026-08-07 10:50:32", group:"小露OA", title:"語音小露 Demo 錄音收集（測試批次二）"},
+  {id:"voice_470068", file:"voice_470068.aac", datetime:"2026-08-07 10:51:51", group:"全電商管理群", title:"批次提報流程口述紀錄"},
+
+  {id:"voice_463846", file:"voice_463846.aac", datetime:"2026-07-24 08:48:49", group:"全電商管理群", title:"母表欄位需求訪談錄音"},
+
+  {id:"voice_460863", file:"voice_460863.aac", datetime:"2026-07-22 03:18:21", group:"小露OA", title:"提案初稿討論錄音"},
+  {id:"voice_460362", file:"voice_460362.aac", datetime:"2026-07-22 03:18:26", group:"小露OA", title:"OIDC 綁定流程細節補充"},
+  {id:"voice_459293", file:"voice_459293.aac", datetime:"2026-07-22 03:18:29", group:"小露OA", title:"分眾標籤定義討論"},
+  {id:"voice_458962", file:"voice_458962.aac", datetime:"2026-07-22 03:19:44", group:"小露OA", title:"提案簡報架構初步構想"},
+];
+
+function pad(n){return n<10?"0"+n:""+n;}
+function todayStr(){
+  const d = new Date(2026,7,17); // 固定示範今日：2026-08-17
+  return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+}
+function getParam(name){ return new URLSearchParams(location.search).get(name); }
+
+function renderList(){
+  const date = document.getElementById('dailyDate').value || todayStr();
+  const rows = DAILY_VOICES.filter(v => v.datetime.slice(0,10) === date);
+  const tbody = document.getElementById('dailyTbody');
+  tbody.innerHTML = '';
+  document.getElementById('dailyCount').textContent = rows.length;
+  document.getElementById('dailyEmpty').style.display = rows.length ? 'none' : 'block';
+  document.getElementById('dailyTable').style.display = rows.length ? 'table' : 'none';
+  rows.forEach((v, idx)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>'+(idx+1)+'</td><td>'+v.group+'</td><td>'+v.datetime+'</td><td>'+v.title+'</td><td class="chev">›</td>';
+    tr.onclick = ()=>{ location.href = '單則語音摘要.html?id='+encodeURIComponent(v.id)+'&date='+encodeURIComponent(date); };
+    tbody.appendChild(tr);
+  });
+}
+function onDateChange(){ renderList(); }
+function jumpToday(){
+  document.getElementById('dailyDate').value = todayStr();
+  renderList();
+}
+
+document.getElementById('dailyDate').value = getParam('date') || todayStr();
+renderList();
+</script>
+</body>
+</html>

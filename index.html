@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全電商技術處 小露AI｜登入</title>
+<style>
+:root{
+  --primary:#169BD5; --pink:#DF0870; --green:#2E9E5B;
+  --orange:#E8912D; --red:#D0362C; --text:#333333;
+  --text-sub:#999999; --border:#E3E6EB; --bg:#F4F6F9;
+  --sidebar-bg:#1B2A4A;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;color:var(--text);background:var(--sidebar-bg);font-size:14px;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background-image:radial-gradient(circle at 15% 20%, rgba(22,155,213,.18), transparent 40%),
+                    radial-gradient(circle at 85% 80%, rgba(22,155,213,.12), transparent 45%);
+}
+a{text-decoration:none;color:inherit;}
+
+.login-wrap{width:380px;max-width:92vw;}
+.brand{text-align:center;margin-bottom:26px;color:#fff;}
+.brand .logo{font-size:38px;margin-bottom:6px;}
+.brand .name{font-size:22px;font-weight:700;letter-spacing:1px;}
+.brand .sub{font-size:12px;color:#9FB0CC;margin-top:6px;}
+
+.card{background:#fff;border-radius:12px;padding:32px 30px 28px;box-shadow:0 18px 40px rgba(0,0,0,.25);}
+.card-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.card-desc{font-size:12px;color:var(--text-sub);margin-bottom:22px;}
+
+.fld{margin-bottom:16px;display:flex;flex-direction:column;gap:6px;}
+.fld label{font-size:12px;color:var(--text-sub);font-weight:700;}
+.fld input{
+  border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:14px;color:var(--text);background:#fff;width:100%;
+}
+.fld input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(22,155,213,.12);}
+.fld .hint{font-size:11px;color:var(--text-sub);}
+
+.err-msg{display:none;background:#FCEBEC;border:1px solid #F2C7CB;color:var(--red);font-size:12.5px;border-radius:6px;padding:9px 12px;margin-bottom:16px;}
+.err-msg.show{display:block;}
+
+.login-btn{width:100%;background:var(--primary);color:#fff;border:none;border-radius:6px;padding:11px 20px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;}
+.login-btn:hover{background:#1287bc;}
+
+.proto-note{margin-top:18px;text-align:center;font-size:11.5px;color:var(--text-sub);line-height:1.7;}
+.proto-note b{color:var(--text);}
+</style>
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="brand">
+    <div class="logo">🎙️</div>
+    <div class="name">全電商技術處 小露AI</div>
+    <div class="sub">LINE 語音智能助理・技術處辦公室自動化</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">登入</div>
+    <div class="card-desc">請輸入帳號、密碼與 Token 以登入小露AI 管理後台</div>
+
+    <div class="err-msg" id="errMsg">請完整輸入帳號、密碼與 Token</div>
+
+    <form id="loginForm" onsubmit="return doLogin(event)">
+      <div class="fld">
+        <label>帳號</label>
+        <input type="text" id="account" placeholder="請輸入帳號" autocomplete="username">
+      </div>
+      <div class="fld">
+        <label>密碼</label>
+        <input type="password" id="password" placeholder="請輸入密碼" autocomplete="current-password">
+      </div>
+      <div class="fld">
+        <label>Token</label>
+        <input type="text" id="token" placeholder="請輸入 Token">
+        <div class="hint">系統核發之驗證 Token（實際規格待與 OIDC／驗證機制負責人確認）</div>
+      </div>
+      <button type="submit" class="login-btn">登入</button>
+    </form>
+
+    <div class="proto-note">此為開發畫面原型，<b>任意輸入帳號／密碼／Token 即可登入</b>；登入後將預設進入「每日語音列表」。</div>
+  </div>
+</div>
+
+<script>
+function doLogin(e){
+  e.preventDefault();
+  const account = document.getElementById('account').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const token = document.getElementById('token').value.trim();
+  const errMsg = document.getElementById('errMsg');
+  if(!account || !password || !token){
+    errMsg.classList.add('show');
+    return false;
+  }
+  errMsg.classList.remove('show');
+  location.href = '每日語音列表.html';
+  return false;
+}
+</script>
+</body>
+</html>

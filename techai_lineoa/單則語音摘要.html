@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>語音小露｜單則語音摘要</title>
+<style>
+:root{
+  --primary:#169BD5; --pink:#DF0870; --green:#2E9E5B;
+  --orange:#E8912D; --red:#D0362C; --text:#333333;
+  --text-sub:#999999; --border:#E3E6EB; --bg:#F4F6F9;
+  --sidebar-bg:#1B2A4A;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;color:var(--text);background:var(--bg);font-size:14px;}
+a{text-decoration:none;color:inherit;}
+
+.app{display:flex;min-height:100vh;}
+.sidebar{width:230px;flex-shrink:0;background:var(--sidebar-bg);color:#fff;display:flex;flex-direction:column;}
+.brand{padding:22px 20px 16px;border-bottom:1px solid rgba(255,255,255,.12);}
+.brand .name{font-size:20px;font-weight:700;letter-spacing:1px;}
+.brand .sub{font-size:11px;color:#9FB0CC;margin-top:4px;}
+.nav{padding:14px 0;flex:1;}
+.nav-group-title{font-size:11px;color:#7C8CAE;padding:6px 20px;letter-spacing:1px;}
+.nav-item{padding:11px 20px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#D8E1F0;border-left:3px solid transparent;}
+.nav-item .ico{font-size:15px;width:18px;text-align:center;}
+.nav-item:hover{background:rgba(255,255,255,.06);}
+.nav-item.active{background:rgba(22,155,213,.18);border-left-color:var(--primary);color:#fff;font-weight:700;}
+.sidebar-footer{padding:14px 20px;font-size:11px;color:#7C8CAE;border-top:1px solid rgba(255,255,255,.12);}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:14px 26px;display:flex;align-items:center;justify-content:space-between;}
+.breadcrumb{font-size:13px;color:var(--text-sub);}
+.breadcrumb b{color:var(--text);font-weight:700;}
+.user-chip{font-size:13px;color:var(--text-sub);}
+.content{padding:22px 26px;flex:1;}
+
+.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--primary);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px;}
+.back-link:hover{text-decoration:underline;}
+
+.detail-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:26px 30px;}
+.detail-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--border);}
+.detail-meta .m-fld label{display:block;font-size:11px;color:var(--text-sub);margin-bottom:5px;}
+.detail-meta .m-fld .v{font-size:14px;font-weight:700;color:var(--text);}
+.block{margin-bottom:22px;}
+.block-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.block-title .dot{width:6px;height:6px;border-radius:50%;background:var(--primary);}
+.block-body{font-size:13.5px;line-height:1.9;color:var(--text);background:#F9FBFD;border:1px solid var(--border);border-radius:6px;padding:14px 16px;white-space:pre-wrap;}
+.block-body.transcript{max-height:260px;overflow-y:auto;font-family:"Roboto",Arial,sans-serif;color:#444;}
+.block-body.note{background:#FFF9EE;border-color:#F2E2C0;color:#7A5A20;font-size:12.5px;}
+.detail-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
+.ghost-btn{background:#fff;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 18px;font-size:14px;cursor:pointer;}
+.ghost-btn:hover{border-color:var(--primary);color:var(--primary);}
+.primary-btn{background:var(--primary);color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:14px;font-weight:700;cursor:pointer;}
+.primary-btn:hover{background:#1287bc;}
+.toast{position:fixed;bottom:26px;right:26px;background:#1B2A4A;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,.18);opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:50;}
+.toast.show{opacity:1;transform:translateY(0);}
+.empty-state{padding:60px 0;text-align:center;color:var(--text-sub);font-size:13px;background:#fff;border:1px solid var(--border);border-radius:8px;}
+.empty-state .big{font-size:30px;margin-bottom:8px;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="brand">
+      <div class="name">🎙️ 語音小露</div>
+      <div class="sub">LINE 語音智能助理・技術處辦公室自動化</div>
+    </div>
+    <div class="nav">
+      <div class="nav-group-title">語音小露</div>
+      <a class="nav-item active" href="每日語音列表.html"><span class="ico">📅</span>每日語音</a>
+      <a class="nav-item" href="日結摘要列表.html"><span class="ico">🗂️</span>日結摘要</a>
+    </div>
+    <div class="sidebar-footer">開發畫面原型 v0.2<br>對應功能二：語音訊息分析摘要</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="breadcrumb">語音小露 &nbsp;›&nbsp; 每日語音 &nbsp;›&nbsp; <b>單則語音摘要</b></div>
+      <div class="user-chip">Chimoon（PXEC）</div>
+    </div>
+
+    <div class="content">
+      <div class="back-link" id="backLink">← 回到每日語音列表</div>
+
+      <div id="detailWrap" class="detail-card" style="display:none;">
+        <div class="detail-meta">
+          <div class="m-fld"><label>語音檔名</label><div class="v" id="d_file">-</div></div>
+          <div class="m-fld"><label>語音檔日期時間</label><div class="v" id="d_time">-</div></div>
+          <div class="m-fld"><label>LINE 群暱稱</label><div class="v" id="d_group">-</div></div>
+          <div class="m-fld"><label>語音標題（AI 整理）</label><div class="v" id="d_title">-</div></div>
+        </div>
+
+        <div class="block">
+          <div class="block-title"><span class="dot"></span>語音摘要</div>
+          <div class="block-body" id="d_summary"></div>
+        </div>
+
+        <div class="block">
+          <div class="block-title"><span class="dot"></span>語音逐字內容</div>
+          <div class="block-body transcript" id="d_transcript"></div>
+        </div>
+
+        <div class="block">
+          <div class="block-title"><span class="dot" style="background:var(--orange);"></span>小露作業說明</div>
+          <div class="block-body note" id="d_note"></div>
+        </div>
+
+        <div class="detail-actions">
+          <button class="ghost-btn" id="backBtn2">返回列表</button>
+          <button class="primary-btn" id="d_downloadBtn">⬇ 轉存 WORD 下載</button>
+        </div>
+      </div>
+
+      <div class="empty-state" id="notFound" style="display:none;">
+        <div class="big">🔍</div>找不到對應的語音紀錄，可能連結已失效
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* 與「每日語音列表.html」共用同一組 mock 資料（正式串接後改為呼叫 API） */
+const DAILY_VOICES = [
+  {id:"voice_501120", file:"voice_501120.aac", datetime:"2026-08-17 09:15:32", group:"全電商管理群", title:"商品標籤母表最新進度回報",
+   summary:"今日進度：商品標籤母表欄位已進入最終確認階段。\n待追蹤事項：NN 特殊流程對焦（負責人 Winnie）、QE 回歸測試預計明日下午完成。\n待確認：母表欄位確認是否代表正式定版？",
+   transcript:"[00:00] 早安，跟大家同步一下標籤母表的狀態……\n[00:18] 目前欄位定義已經跟商品中台那邊對過一輪，NN 特殊流程的部分 Winnie 那邊還在對焦中。\n[00:47] QE 那邊說回歸測試明天下午可以跑完，如果沒問題的話母表就可以定版了。\n[01:20] 想跟大家確認一下，母表欄位確認是不是就代表正式定版了？這個要跟 PM 那邊再核對一次。"},
+  {id:"voice_501133", file:"voice_501133.aac", datetime:"2026-08-17 10:42:07", group:"全電商管理群", title:"批次提報異常案例討論",
+   summary:"今日進度：批次提報流程於草稿送審階段發現 3 筆異常商品，已標記待複核。\n待追蹤事項：異常商品需於下午前完成人工複核（負責人：品保組）。\n待確認：異常商品是否需要暫停上架流程？",
+   transcript:"[00:00] 這邊回報一下批次提報的狀況，剛剛系統跑批次的時候發現三筆商品有異常。\n[00:25] 主要是規格型號對不上草稿編號，目前先標記起來讓品保那邊複核。\n[00:52] 想確認一下，如果複核沒過的話，是不是要先暫停這幾筆的上架流程？"},
+  {id:"voice_501150", file:"voice_501150.aac", datetime:"2026-08-17 14:05:51", group:"小露OA", title:"母表定版前最後確認事項",
+   summary:"今日進度：母表三張分類（飾品、髮束、邊夾）皆已核對完成。\n待追蹤事項：待金銀飾類補充第二張母表選項（負責人：設計組）。\n待確認：定版後是否需要另行通知全電商窗口？",
+   transcript:"[00:00] 母表這邊今天做最後確認，飾品、髮束、邊夾三張都已經核對完畢。\n[00:30] 金銀飾類那邊因為量比較大，設計組說還要再補一張母表選項進去。\n[01:02] 定版之後是不是要另外發訊息通知全電商那邊的窗口，麻煩大家幫忙確認一下。"},
+  {id:"voice_501162", file:"voice_501162.aac", datetime:"2026-08-17 17:38:12", group:"全電商管理群", title:"明日 QE 回歸測試排程與收尾",
+   summary:"今日進度：今日各項對焦事項皆已完成，明日將進行 QE 回歸測試。\n待追蹤事項：回歸測試報告需於明日 17:00 前提供（負責人：QE）。\n待確認：測試若發現問題，是否延後母表定版時程？",
+   transcript:"[00:00] 收個尾，今天的對焦事項都處理完了，明天主要就是等 QE 跑回歸測試。\n[00:22] 報告麻煩明天下午五點前給我們，這樣才來得及看要不要調整時程。\n[00:41] 如果測試發現問題，母表定版是不是就要往後延，這個想先跟大家提一下心理準備。"},
+
+  {id:"voice_472499", file:"voice_472499.aac", datetime:"2026-08-07 10:50:18", group:"小露OA", title:"語音小露 Demo 錄音收集（測試批次一）",
+   summary:"今日進度：完成第一批語音樣本收集，供小露語音辨識模型測試使用。\n待追蹤事項：確認錄音品質是否符合 STT 辨識門檻。\n待確認：是否需要補錄不同口音樣本？",
+   transcript:"[00:00] 這是第一批的測試錄音，內容主要是模擬平常回報進度的語氣。\n[00:15] 錄完之後麻煩幫忙檢查一下音質，看看轉出來的逐字稿準不準。"},
+  {id:"voice_471392", file:"voice_471392.aac", datetime:"2026-08-07 10:50:32", group:"小露OA", title:"語音小露 Demo 錄音收集（測試批次二）",
+   summary:"今日進度：第二批測試錄音已上傳，涵蓋較長語句與專有名詞。\n待追蹤事項：專有名詞（如母表、批次提報）辨識準確率待確認。",
+   transcript:"[00:00] 第二批補充一些比較長的句子，還有一些專有名詞像是母表、批次提報這些。\n[00:20] 想看看小露對這些名詞辨識的準確度如何。"},
+  {id:"voice_470068", file:"voice_470068.aac", datetime:"2026-08-07 10:51:51", group:"全電商管理群", title:"批次提報流程口述紀錄",
+   summary:"今日進度：口述目前批次提報流程供文件比對使用。\n待確認：口述內容與現行 SOP 是否一致？",
+   transcript:"[00:00] 我這邊口述一下目前批次提報的流程，從申請貨號開始……\n[00:35] 之後會進到草稿查詢與送審，這段跟現行 SOP 應該是一致的。"},
+
+  {id:"voice_463846", file:"voice_463846.aac", datetime:"2026-07-24 08:48:49", group:"全電商管理群", title:"母表欄位需求訪談錄音",
+   summary:"今日進度：完成母表欄位需求訪談，蒐集三組使用情境。\n待追蹤事項：需求文件待彙整後於週會提出。",
+   transcript:"[00:00] 這邊訪談一下母表欄位的使用情境，主要有三種狀況……\n[00:40] 訪談內容會整理成文件，週會的時候再跟大家報告。"},
+
+  {id:"voice_460863", file:"voice_460863.aac", datetime:"2026-07-22 03:18:21", group:"小露OA", title:"提案初稿討論錄音",
+   summary:"今日進度：針對 LINE AI 機器人提案初稿進行討論，聚焦身份綁定與語音摘要兩項能力。\n待確認：里程碑週次是否需要微調？",
+   transcript:"[00:00] 針對提案初稿討論一下，目前先聚焦身份綁定跟語音摘要這兩項能力。\n[00:33] 里程碑的週次安排想再跟大家確認一下要不要微調。"},
+  {id:"voice_460362", file:"voice_460362.aac", datetime:"2026-07-22 03:18:26", group:"小露OA", title:"OIDC 綁定流程細節補充",
+   summary:"今日進度：補充 OIDC PKCE 綁定流程細節，確認 state 與 code_verifier 儲存方式。",
+   transcript:"[00:00] 補充一下綁定流程的細節，state 跟 code_verifier 這兩個要怎麼存……\n[00:28] 目前規劃是短效加密儲存，到期就清除。"},
+  {id:"voice_459293", file:"voice_459293.aac", datetime:"2026-07-22 03:18:29", group:"小露OA", title:"分眾標籤定義討論",
+   summary:"今日進度：討論分眾標籤（segment）定義方式，初步規劃依部門與專案兩種類型。",
+   transcript:"[00:00] 分眾標籤這邊討論一下要怎麼定義，目前想法是分部門跟專案兩種類型。"},
+  {id:"voice_458962", file:"voice_458962.aac", datetime:"2026-07-22 03:19:44", group:"小露OA", title:"提案簡報架構初步構想",
+   summary:"今日進度：討論提案簡報架構，涵蓋現況痛點、能力介紹、里程碑三大段落。",
+   transcript:"[00:00] 簡報架構先抓三大段落，現況痛點、能力介紹，最後是里程碑時程。\n[00:26] 大家再幫忙補充一下現況痛點的具體案例。"},
+];
+
+const DAILY_NOTE = "本內容由小露（AI 語音助理）自動轉錄與摘要：語音轉文字使用 Google Cloud Speech-to-Text，結構化摘要使用 Vertex AI Gemini，送入前已執行敏感資訊遮罩處理。摘要僅供參考、不作為正式決策依據，請負責人以逐字內容確認後執行；原始語音檔將於處理完成後 24 小時內自動清除。";
+
+function getParam(name){ return new URLSearchParams(location.search).get(name); }
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+function downloadAsWord(filename, title, bodyHtml){
+  const html = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>"+
+    "<head><meta charset='utf-8'><title>"+title+"</title></head><body>"+bodyHtml+"</body></html>";
+  const blob = new Blob(['﻿', html], {type:'application/msword'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast("已產生 WORD 文件：" + filename);
+}
+
+const id = getParam('id');
+const date = getParam('date');
+const backHref = '每日語音列表.html' + (date ? ('?date='+encodeURIComponent(date)) : '');
+document.getElementById('backLink').onclick = ()=>{ location.href = backHref; };
+
+const v = DAILY_VOICES.find(x => x.id === id);
+if(v){
+  document.getElementById('detailWrap').style.display = 'block';
+  document.getElementById('d_file').textContent = v.file;
+  document.getElementById('d_time').textContent = v.datetime;
+  document.getElementById('d_group').textContent = v.group;
+  document.getElementById('d_title').textContent = v.title;
+  document.getElementById('d_summary').textContent = v.summary;
+  document.getElementById('d_transcript').textContent = v.transcript;
+  document.getElementById('d_note').textContent = DAILY_NOTE;
+  document.getElementById('backBtn2').onclick = ()=>{ location.href = backHref; };
+  document.getElementById('d_downloadBtn').onclick = ()=>{
+    downloadAsWord(v.file.replace('.aac','') + '_語音摘要.doc', v.title,
+      '<h2>'+v.title+'</h2><p><b>語音檔名：</b>'+v.file+'</p><p><b>語音檔日期時間：</b>'+v.datetime+'</p><p><b>LINE 群暱稱：</b>'+v.group+'</p>'+
+      '<h3>語音摘要</h3><p style="white-space:pre-wrap;">'+v.summary+'</p>'+
+      '<h3>語音逐字內容</h3><p style="white-space:pre-wrap;">'+v.transcript+'</p>'+
+      '<h3>小露作業說明</h3><p style="white-space:pre-wrap;font-size:12px;color:#7A5A20;">'+DAILY_NOTE+'</p>');
+  };
+} else {
+  document.getElementById('notFound').style.display = 'block';
+}
+</script>
+</body>
+</html>
