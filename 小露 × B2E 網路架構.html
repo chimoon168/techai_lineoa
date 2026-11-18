@@ -1,0 +1,317 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>小露 × B2E 網路架構</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single reading column (~980px) with one wide diagram that scrolls on phones; tables carry the specifics */
+:root{
+  --bg:#f6f8fa; --surface:#ffffff; --fg:#17212b; --muted:#5b6876; --line:#d5dde5;
+  --zone:#eef2f6; --zone-dmz:#f7efe3; --zone-b2e:#eaf1f8;
+  --accent:#0a6bc4; --accent-soft:#e1eefa; --idp:#a2620d; --warn:#b4372f;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161c; --surface:#18202a; --fg:#e4eaf0; --muted:#97a4b2; --line:#2e3946;
+  --zone:#1a222c; --zone-dmz:#262017; --zone-b2e:#172331;
+  --accent:#5aa9f0; --accent-soft:#16304a; --idp:#e0a54f; --warn:#ef7c72; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161c; --surface:#18202a; --fg:#e4eaf0; --muted:#97a4b2; --line:#2e3946;
+  --zone:#1a222c; --zone-dmz:#262017; --zone-b2e:#172331;
+  --accent:#5aa9f0; --accent-soft:#16304a; --idp:#e0a54f; --warn:#ef7c72; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.65}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:32px 64px;display:grid;gap:36px}
+header{display:grid;gap:6px}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--muted);font-family:var(--f-mono)}
+h1{font-size:28px;line-height:1.25;margin:0;text-wrap:balance}
+h2{font-size:19px;margin:0 0 12px;text-wrap:balance}
+p{margin:0;max-width:68ch}
+.author{font-size:13px;color:var(--muted)}
+.lede{color:var(--muted)}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+.keys{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.keys li{padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.keys li b{color:var(--accent)}
+figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px}
+.scroll{overflow-x:auto}
+svg.arch{display:block;width:100%;min-width:900px;height:auto;color:var(--fg)}
+figcaption{font-size:13px;color:var(--muted);padding:10px 4px 2px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:13px;color:var(--muted);padding:6px 4px 0}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:22px;height:0;border-top:2px solid var(--fg)}
+.sw.new{border-top:3px solid var(--accent)}
+.sw.idp{border-top:2px dashed var(--idp)}
+.sw.dash{border-top:2px dashed var(--muted)}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:720px}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
+th{font-weight:500;color:var(--muted);font-size:12.5px;background:var(--zone)}
+tr:last-child td{border-bottom:0}
+tr.hl td{background:var(--accent-soft)}
+.n{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;font-size:11px;font-family:var(--f-mono);border:1.5px solid currentColor}
+.n.new{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.pill{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+.pill.w{color:var(--warn);border-color:var(--warn)}
+.pill.r{color:var(--accent);border-color:var(--accent)}
+.pill.q{color:var(--idp);border-color:var(--idp)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.two>div{min-width:0}
+pre{margin:0;background:var(--zone);border:1px solid var(--line);border-radius:6px;padding:12px 14px;overflow-x:auto;font-family:var(--f-mono);font-size:12.5px;line-height:1.6}
+ol.q{margin:0;padding-left:22px;display:grid;gap:8px;max-width:75ch}
+ol.q b{font-weight:500}
+.who{color:var(--muted);font-size:12.5px}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">技術處辦公室自動化 · 小露 LINEOA · 草案 v0.1 · 2026-10-07</div>
+  <h1>小露 × B2E 網路架構</h1>
+  <div class="author">作者：chimoon 高千月 · 全電商技術處</div>
+  <p class="lede">評估另開一條「小露專屬」的 B2E 業務 API 通道，承載商品查詢、變價查詢、採購加減量、變價鎖檔，與既有 OIDC 綁定通道分離。</p>
+</header>
+
+<section>
+  <h2>結論先講</h2>
+  <ul class="keys">
+    <li><b>OIDC 留在「身分」用途。</b>它必須對 Internet 開放（使用者手機的 LIFF 瀏覽器要直接連 <code>/connect/authorize</code>），白名單是 client_id / redirect_uri 這類應用層設定，不適合再掛業務寫入權限。</li>
+    <li><b>新開「B2E LINEOA 業務 API」通道，只走內網。</b>獨立 listener / 路徑前綴 <code>/api/lineoa/1.0/*</code>、獨立憑證（mTLS + API Key/HMAC）、防火牆只放行小露主機，不經過 OIDC。</li>
+    <li><b>使用者身分以「代理呼叫」帶入，由 B2E 重驗。</b>小露送出 MemberId，B2E 在每次請求當下檢查帳號狀態與 LINEOA 身份，寫入類作業（加減量、鎖檔）另加冪等鍵與稽核。</li>
+  </ul>
+</section>
+
+<section>
+  <h2>系統架構與網路分區</h2>
+  <figure>
+    <div class="scroll">
+    <svg class="arch" viewBox="0 0 1200 660" role="img" aria-label="LINE、小露、B2E 的網路分區與七條通道；新通道⑤只在內網由小露 Adapter 連到 B2E LINEOA 業務 API，與走 Internet 的 OIDC 通道分開">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+        <marker id="ahA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/></marker>
+        <marker id="ahI" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--idp)"/></marker>
+      </defs>
+
+      <!-- zones -->
+      <rect x="10" y="40" width="250" height="600" rx="8" fill="var(--zone)" stroke="var(--line)"/>
+      <rect x="275" y="40" width="170" height="600" rx="8" fill="var(--zone-dmz)" stroke="var(--line)"/>
+      <rect x="460" y="40" width="270" height="600" rx="8" fill="var(--zone)" stroke="var(--line)"/>
+      <rect x="770" y="40" width="420" height="600" rx="8" fill="var(--zone-b2e)" stroke="var(--line)"/>
+      <g font-size="12" font-family="IBM Plex Mono, monospace" fill="var(--muted)" letter-spacing="1">
+        <text x="22" y="60">INTERNET</text>
+        <text x="287" y="60">DMZ</text>
+        <text x="472" y="60">內網 · 小露服務區</text>
+        <text x="782" y="60">內網 · B2E 服務區</text>
+      </g>
+
+      <!-- firewall lines -->
+      <g stroke="var(--warn)" stroke-width="1.5" stroke-dasharray="3 5">
+        <line x1="267.5" y1="70" x2="267.5" y2="625"/>
+        <line x1="452.5" y1="70" x2="452.5" y2="625"/>
+        <line x1="750" y1="70" x2="750" y2="625"/>
+      </g>
+      <g font-size="11" font-family="IBM Plex Mono, monospace" fill="var(--warn)" text-anchor="middle">
+        <text x="267.5" y="638">FW-外</text>
+        <text x="452.5" y="638">FW-內</text>
+        <text x="750" y="638">FW-B2E</text>
+      </g>
+
+      <!-- boxes -->
+      <g font-size="13" fill="currentColor">
+        <!-- phone -->
+        <rect x="30" y="72" width="210" height="62" rx="6" fill="var(--surface)" stroke="currentColor"/>
+        <text x="135" y="98" text-anchor="middle" font-weight="700">員工手機 LINE App</text>
+        <text x="135" y="118" text-anchor="middle" font-size="11.5" fill="var(--muted)">聊天室 · LIFF 內建瀏覽器</text>
+        <!-- LINE platform -->
+        <rect x="30" y="268" width="210" height="92" rx="6" fill="var(--surface)" stroke="currentColor"/>
+        <text x="135" y="294" text-anchor="middle" font-weight="700">LINE Platform</text>
+        <text x="135" y="314" text-anchor="middle" font-size="11.5" fill="var(--muted)">Webhook 發送端</text>
+        <text x="135" y="332" text-anchor="middle" font-size="11.5" fill="var(--muted)">Messaging API</text>
+        <text x="135" y="350" text-anchor="middle" font-size="11" font-family="IBM Plex Mono, monospace" fill="var(--muted)">api.line.me</text>
+        <!-- Google -->
+        <rect x="30" y="560" width="210" height="58" rx="6" fill="var(--surface)" stroke="currentColor"/>
+        <text x="135" y="584" text-anchor="middle" font-weight="700">Google Cloud</text>
+        <text x="135" y="604" text-anchor="middle" font-size="11.5" fill="var(--muted)">STT · Gemini · Docs</text>
+        <!-- WAF -->
+        <rect x="290" y="260" width="140" height="110" rx="6" fill="var(--surface)" stroke="currentColor"/>
+        <text x="360" y="286" text-anchor="middle" font-weight="700">WAF / 反向代理</text>
+        <text x="360" y="308" text-anchor="middle" font-size="11.5" fill="var(--muted)">公開 FQDN · 443</text>
+        <text x="360" y="328" text-anchor="middle" font-size="11" font-family="IBM Plex Mono, monospace" fill="var(--muted)">/webhook</text>
+        <text x="360" y="344" text-anchor="middle" font-size="11" font-family="IBM Plex Mono, monospace" fill="var(--muted)">/liff  /binding</text>
+        <!-- Egress -->
+        <rect x="290" y="470" width="140" height="80" rx="6" fill="var(--surface)" stroke="currentColor"/>
+        <text x="360" y="500" text-anchor="middle" font-weight="700">Egress Proxy</text>
+        <text x="360" y="522" text-anchor="middle" font-size="11.5" fill="var(--muted)">出站 FQDN 白名單</text>
+        <!-- Lulu API -->
+        <rect x="480" y="250" width="230" height="90" rx="6" fill="var(--surface)" stroke="currentColor"/>
+        <text x="595" y="278" text-anchor="middle" font-weight="700">小露 API / Worker</text>
+        <text x="595" y="300" text-anchor="middle" font-size="11.5" fill="var(--muted)">Webhook 分派 · LIFF 後端</text>
+        <text x="595" y="318" text-anchor="middle" font-size="11.5" fill="var(--muted)">綁定 · 語音摘要 · 推播</text>
+        <!-- Adapter (new) -->
+        <rect x="480" y="390" width="230" height="80" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="595" y="418" text-anchor="middle" font-weight="700" fill="var(--accent)">B2E Adapter（新）</text>
+        <text x="595" y="440" text-anchor="middle" font-size="11.5" fill="var(--muted)">專屬 client 憑證 · 簽章</text>
+        <text x="595" y="457" text-anchor="middle" font-size="11.5" fill="var(--muted)">冪等鍵 · 逾時 / 重試</text>
+        <!-- Lulu DB -->
+        <rect x="480" y="530" width="230" height="62" rx="6" fill="var(--surface)" stroke="currentColor"/>
+        <text x="595" y="556" text-anchor="middle" font-weight="700">小露 DB</text>
+        <text x="595" y="576" text-anchor="middle" font-size="11.5" fill="var(--muted)">綁定 · 員工快取 · 呼叫稽核</text>
+        <!-- OIDC -->
+        <rect x="790" y="72" width="380" height="68" rx="6" fill="var(--surface)" stroke="var(--idp)" stroke-width="1.5"/>
+        <text x="980" y="96" text-anchor="middle" font-weight="700" fill="var(--idp)">B2E OIDC Provider（既有 · 對外公開）</text>
+        <text x="980" y="115" text-anchor="middle" font-size="11" font-family="IBM Plex Mono, monospace" fill="var(--muted)">/connect/authorize · /token · /userinfo</text>
+        <text x="980" y="132" text-anchor="middle" font-size="11.5" fill="var(--muted)">白名單：client_id · redirect_uri</text>
+        <!-- identity API -->
+        <rect x="790" y="200" width="185" height="70" rx="6" fill="var(--surface)" stroke="currentColor"/>
+        <text x="882" y="226" text-anchor="middle" font-weight="700">身份查詢 API（既有）</text>
+        <text x="882" y="246" text-anchor="middle" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="var(--muted)">/api/external/1.0/</text>
+        <text x="882" y="261" text-anchor="middle" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="var(--muted)">line-oa-identity/member</text>
+        <!-- kafka -->
+        <rect x="990" y="200" width="180" height="70" rx="6" fill="var(--surface)" stroke="currentColor"/>
+        <text x="1080" y="226" text-anchor="middle" font-weight="700">Kafka（既有）</text>
+        <text x="1080" y="246" text-anchor="middle" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="var(--muted)">PXB2E.Internal.</text>
+        <text x="1080" y="261" text-anchor="middle" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="var(--muted)">MemberSnapshotChanged</text>
+        <!-- gateway new -->
+        <rect x="790" y="380" width="380" height="100" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="980" y="406" text-anchor="middle" font-weight="700" fill="var(--accent)">B2E LINEOA 業務 API（新通道）</text>
+        <text x="980" y="427" text-anchor="middle" font-size="11.5" font-family="IBM Plex Mono, monospace" fill="currentColor">/api/lineoa/1.0/*  · 僅內網 listener</text>
+        <text x="980" y="447" text-anchor="middle" font-size="11.5" fill="var(--muted)">mTLS + API Key/HMAC · 來源 IP 白名單</text>
+        <text x="980" y="466" text-anchor="middle" font-size="11.5" fill="var(--muted)">限流 · 身份權限重驗 · 稽核</text>
+        <!-- core -->
+        <rect x="790" y="530" width="380" height="80" rx="6" fill="var(--surface)" stroke="currentColor"/>
+        <text x="980" y="556" text-anchor="middle" font-weight="700">B2E 核心服務</text>
+        <text x="980" y="576" text-anchor="middle" font-size="11.5" fill="var(--muted)">商品 · 變價 · 採購加減量 · 鎖檔</text>
+        <text x="980" y="595" text-anchor="middle" font-size="11.5" fill="var(--muted)">→ SCM 送審 / autopass · EBO</text>
+      </g>
+
+      <!-- flows -->
+      <g fill="none" stroke-width="1.6">
+        <!-- ③ front channel phone -> OIDC -->
+        <path d="M240 100 H788" stroke="var(--idp)" stroke-dasharray="6 4" marker-end="url(#ahI)"/>
+        <!-- LIFF page phone -> WAF -->
+        <path d="M200 134 V215 H360 V258" stroke="currentColor" marker-end="url(#ah)"/>
+        <!-- ① LINE -> WAF -> Lulu -->
+        <path d="M240 305 H288" stroke="currentColor" marker-end="url(#ah)"/>
+        <path d="M430 305 H478" stroke="currentColor" marker-end="url(#ah)"/>
+        <!-- ② Lulu -> egress -> LINE / Google -->
+        <path d="M480 328 H456 V510 H432" stroke="currentColor" marker-end="url(#ah)"/>
+        <path d="M290 490 H200 V362" stroke="currentColor" marker-end="url(#ah)"/>
+        <path d="M290 530 H258 V590 H242" stroke="currentColor" marker-end="url(#ah)"/>
+        <!-- ④ back channel token -->
+        <path d="M650 250 V170 H830 V142" stroke="var(--idp)" stroke-dasharray="6 4" marker-end="url(#ahI)"/>
+        <!-- internal lulu -> adapter, adapter -> db -->
+        <path d="M595 340 V388" stroke="currentColor" marker-end="url(#ah)"/>
+        <path d="M595 470 V528" stroke="currentColor" marker-end="url(#ah)"/>
+        <!-- ⑤ new channel -->
+        <path d="M710 430 H786" stroke="var(--accent)" stroke-width="3.5" marker-end="url(#ahA)"/>
+        <!-- ⑥ kafka -> lulu -->
+        <path d="M1080 270 V315 H712" stroke="var(--muted)" stroke-dasharray="4 4" marker-end="url(#ah)"/>
+        <!-- ⑦ reconcile -->
+        <path d="M710 280 H765 V235 H788" stroke="var(--muted)" stroke-dasharray="4 4" marker-end="url(#ah)"/>
+        <!-- gateway -> core -->
+        <path d="M980 480 V528" stroke="var(--accent)" stroke-width="2" marker-end="url(#ahA)"/>
+      </g>
+
+      <!-- labels on flows -->
+      <g font-size="11.5" fill="var(--muted)">
+        <text x="515" y="92" text-anchor="middle">使用者瀏覽器直連授權頁（走 Internet）</text>
+        <text x="280" y="209" text-anchor="middle">LIFF 頁面</text>
+        <text x="740" y="164" text-anchor="middle">token · userinfo</text>
+        <text x="992" y="510" text-anchor="start">代理 MemberId</text>
+        <text x="900" y="332" text-anchor="middle">身份快照（consumer）</text>
+      </g>
+
+      <!-- number badges -->
+      <g font-size="11" font-family="IBM Plex Mono, monospace" text-anchor="middle" font-weight="500">
+        <circle cx="264" cy="305" r="10" fill="var(--surface)" stroke="currentColor"/><text x="264" y="309" fill="currentColor">1</text>
+        <circle cx="456" cy="420" r="10" fill="var(--surface)" stroke="currentColor"/><text x="456" y="424" fill="currentColor">2</text>
+        <circle cx="660" cy="100" r="10" fill="var(--surface)" stroke="var(--idp)"/><text x="660" y="104" fill="var(--idp)">3</text>
+        <circle cx="650" cy="205" r="10" fill="var(--surface)" stroke="var(--idp)"/><text x="650" y="209" fill="var(--idp)">4</text>
+        <circle cx="748" cy="430" r="12" fill="var(--accent)" stroke="var(--accent)"/><text x="748" y="434" fill="var(--surface)">5</text>
+        <circle cx="1080" cy="293" r="10" fill="var(--surface)" stroke="var(--muted)"/><text x="1080" y="297" fill="var(--muted)">6</text>
+        <circle cx="765" cy="258" r="10" fill="var(--surface)" stroke="var(--muted)"/><text x="765" y="262" fill="var(--muted)">7</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span><i class="sw"></i>既有 LINE / 小露流量</span>
+      <span><i class="sw idp"></i>OIDC 身分通道（既有）</span>
+      <span><i class="sw new"></i>小露 → B2E 業務通道（新）</span>
+      <span><i class="sw dash"></i>身份同步 / 對帳（既有）</span>
+    </div>
+    <figcaption>OIDC（③④）與新業務通道（⑤）在 B2E 端是兩個入口：前者要讓手機瀏覽器從 Internet 連得到，後者只接受小露 Adapter 從內網連入。小露位置以「同一機房／VPC 內網」為前提，若部署在雲端需另加 site-to-site VPN（見待確認 1）。</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>各通道網路設定</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>通道</th><th>來源 → 目的</th><th>協定 / Port</th><th>曝露面</th><th>認證 / 防護</th><th>設定方</th></tr></thead>
+    <tbody>
+      <tr><td><span class="n">1</span></td><td>LINE Webhook 入站</td><td>LINE Platform → WAF → 小露 API</td><td>HTTPS 443</td><td>Internet 入站</td><td>X-Line-Signature（HMAC）。LINE 未公開固定來源 IP，入站無法靠 IP 白名單</td><td class="who">網管（WAF/DNS/憑證）</td></tr>
+      <tr><td><span class="n">2</span></td><td>小露出站</td><td>小露 → Egress → api.line.me、api-data.line.me、Google API</td><td>HTTPS 443</td><td>Internet 出站</td><td>Channel Access Token；Proxy 以 FQDN 白名單放行</td><td class="who">網管</td></tr>
+      <tr><td><span class="n">3</span></td><td>OIDC 前端通道</td><td>手機 LIFF 瀏覽器 → B2E <code>/connect/authorize</code></td><td>HTTPS 443</td><td>Internet（B2E 既有公開入口）</td><td>PKCE、state；redirect_uri 白名單</td><td class="who">B2E（OIDC client 設定）</td></tr>
+      <tr><td><span class="n">4</span></td><td>OIDC 後端通道</td><td>小露 API → B2E <code>/connect/token</code>、<code>/userinfo</code></td><td>HTTPS 443</td><td>內網或公開入口皆可</td><td>client_secret；只拿身分，<b>不帶業務 scope</b></td><td class="who">B2E</td></tr>
+      <tr class="hl"><td><span class="n new">5</span></td><td><b>小露業務通道（新）</b></td><td>小露 Adapter → B2E LINEOA 業務 API</td><td>HTTPS 443（內網 listener）</td><td><b>僅內網</b>，不發布到 Internet</td><td>mTLS（client 憑證）＋ API Key/HMAC（timestamp、nonce 防重放）＋ 來源 IP 白名單 ＋ 限流</td><td class="who">網管（FW 規則、DNS）、B2E（API、金鑰）、資安（憑證）</td></tr>
+      <tr><td><span class="n">6</span></td><td>身份快照</td><td>小露 Worker ← Kafka broker</td><td>Kafka（SASL/TLS，port 依 B2E 提供）</td><td>僅內網</td><td>Consumer 帳號、group 由 B2E 發放</td><td class="who">B2E</td></tr>
+      <tr><td><span class="n">7</span></td><td>身份對帳</td><td>小露 → <code>/api/external/1.0/line-oa-identity/member</code></td><td>HTTPS 443</td><td>僅內網（建議）</td><td>B2E 發的 32 字元 Bearer token</td><td class="who">B2E</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>為什麼不與 OIDC 混用</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>比較</th><th>A. 借用 OIDC（加 scope / client_credentials）</th><th>B. 另開小露專屬業務通道（建議）</th></tr></thead>
+    <tbody>
+      <tr><td>網路曝露</td><td>OIDC 必須對 Internet 開放，業務授權跟著掛在公開入口上</td><td>業務 API 只開內網 listener，Internet 看不到</td></tr>
+      <tr><td>影響範圍</td><td>OIDC 服務其他系統；小露的 scope、token 壽命、限流調整都會牽動共用設定</td><td>與 OIDC 解耦，小露的限流、停用、金鑰輪替只影響自己</td></tr>
+      <tr><td>使用者在場與否</td><td>背景作業（推播後的鎖檔、對帳）手上沒有使用者 token</td><td>系統憑證 ＋ 代理 MemberId，前景、背景都能呼叫</td></tr>
+      <tr><td>權限語意</td><td>OIDC 的 <code>systems</code> claim 是 B2E 後台權限；LINEOA 身份規格明確寫「不是 B2E 權限角色」</td><td>B2E 端依 <code>LineOaIdentityId</code> 對應功能，規則集中在業務 API</td></tr>
+      <tr><td>出事時</td><td>要關小露只能動 OIDC client，可能誤傷綁定流程</td><td>撤銷 Adapter 憑證或 FW 規則即可斷開，綁定不受影響</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="two">
+  <div>
+    <h2>新通道承載的 4 項功能</h2>
+    <div class="tbl"><table style="min-width:520px">
+      <thead><tr><th>功能</th><th>建議路徑</th><th>類型</th></tr></thead>
+      <tbody>
+        <tr><td>查詢商品<br><span class="who">基本資料 / 狀態 / 可銷量</span></td><td><code>GET /products/{pxNo}</code></td><td><span class="pill r">讀</span></td></tr>
+        <tr><td>查詢變價<br><span class="who">銷售門市 / 取貨門市 / 活動起迄 / 限量</span></td><td><code>GET /price-changes?pxNo=</code></td><td><span class="pill r">讀</span></td></tr>
+        <tr><td>採購加減量<br><span class="who">＝供應商送審 + autopass</span></td><td><code>POST /purchase-adjustments</code></td><td><span class="pill w">寫</span></td></tr>
+        <tr><td>變價鎖檔</td><td><code>POST /price-changes/{id}/lock</code></td><td><span class="pill w">寫</span></td></tr>
+      </tbody>
+    </table></div>
+    <p class="who" style="margin-top:8px">路徑皆在 <code>/api/lineoa/1.0</code> 之下。依身份規格，加減量與鎖檔目前只屬「20 全聯採購」；30 全電商MD、40 全聯行銷可查商品與可銷量；變價查詢的開放對象<span class="pill q">待確認</span></p>
+  </div>
+  <div>
+    <h2>請求要帶的東西</h2>
+<pre>POST /api/lineoa/1.0/purchase-adjustments
+(mTLS client cert: lulu-adapter)
+X-Client-Id:      lulu-lineoa
+X-Timestamp:      1791340800
+X-Nonce:          7f3c…
+X-Signature:      HMAC-SHA256(secret,
+                    method+path+ts+nonce+sha256(body))
+X-Acting-Member:  1234        ← 綁定的 B2E MemberId
+X-Line-User-Id:   U1a2b…      ← 稽核用
+Idempotency-Key:  7c1e…       ← 寫入類必帶</pre>
+    <p class="who" style="margin-top:8px">B2E 收到後依當下 <code>USR_Member</code> 重驗：在職、身份非 null、身份允許此功能；不信任小露端快取（身份規格 §2.3 亦建議敏感動作前重查）。</p>
+  </div>
+</section>
+
+<section>
+  <h2>待確認事項</h2>
+  <ol class="q">
+    <li><b>小露部署位置</b>：與 B2E 同機房／VPC，或在 GCP？若跨雲，⑤⑥⑦ 需走 site-to-site VPN 或專線，不建議改成公開 API。<span class="who">— 網管</span></li>
+    <li><b>B2E 是否已有內部 API Gateway</b> 可掛 <code>/api/lineoa/*</code>，或由 B2E 另起內網 listener／子網域（例如 <code>b2e-lineoa.internal</code>）。<span class="who">— B2E 開發、網管</span></li>
+    <li><b>認證強度</b>：mTLS ＋ HMAC 雙層，或僅 HMAC ＋ IP 白名單；憑證與 secret 的存放與輪替週期。<span class="who">— 資安</span></li>
+    <li><b>寫入類的 create_by</b>：加減量、鎖檔在 B2E／SCM 記錄為「操作人 MemberId」或「系統帳號＋代理人」；autopass 是否需要另一層主管確認。<span class="who">— PM、SCM</span></li>
+    <li><b>LINE 端確認步驟</b>：寫入前是否強制在 LINE 顯示確認卡片（數量、門市、起迄），避免誤觸。<span class="who">— PM</span></li>
+    <li><b>限流與時效</b>：每人／每分鐘上限、B2E 回應逾時（LINE reply token 約 1 分鐘有效，查詢要在時限內回覆，否則改用 push）。<span class="who">— B2E、小露開發</span></li>
+  </ol>
+</section>
+</div>
+
+</body></html>

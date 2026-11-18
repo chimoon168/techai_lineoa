@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LINEOA身份維護</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sb:#2c3e50; --sb-hover:#34495e; --sb-active:#1f2d3a;
+  --bg:#eef0f3; --card:#fff; --border:#dee2e6; --line:#e9ecef;
+  --text:#212529; --muted:#6c757d;
+  --blue:#0d6efd; --blue-soft:#e7f1ff;
+  --green:#198754; --green-soft:#d1e7dd; --green-head:#0f7a4a;
+  --gray:#6c757d; --red:#dc3545; --orange:#fd7e14; --orange-soft:#fff3cd;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;font-size:14px;color:var(--text);background:var(--bg)}
+a{color:inherit;text-decoration:none}
+svg.i{width:16px;height:16px;fill:currentColor;flex-shrink:0}
+
+/* ===== Layout ===== */
+.app{display:flex;min-height:100vh}
+.sidebar{width:280px;flex-shrink:0;background:var(--sb);color:#fff;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:18px 16px 10px;font-size:18px;font-weight:700}
+.brand .logo{width:30px;height:30px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center}
+.brand .logo svg{width:16px;height:16px;fill:#fff}
+.profile{display:flex;align-items:center;gap:12px;padding:12px 16px 18px}
+.avatar{width:58px;height:58px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#9fb4ff,#5b6fe0);border:3px solid #fff;position:relative}
+.avatar:before,.avatar:after{content:"";position:absolute;top:24px;width:4px;height:4px;border-radius:50%;background:#2b2f5e}
+.avatar:before{left:18px}.avatar:after{left:32px}
+.profile small{display:block;font-size:10px;color:#b8c4d0}
+.profile b{font-size:14px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:18px 16px 18px 8px;font-size:15px;color:#e8edf2;cursor:pointer;user-select:none}
+.nav-item:hover{background:var(--sb-hover)}
+.nav-item .chev{margin-left:auto;width:14px;height:14px;transition:transform .2s}
+.nav-item.open .chev{transform:rotate(180deg)}
+.nav-sub{display:none;background:var(--sb-active)}
+.nav-item.open + .nav-sub{display:block}
+.nav-sub a{display:block;padding:11px 16px 11px 40px;font-size:14px;color:#c9d3dd;border-left:3px solid transparent}
+.nav-sub a:hover{background:var(--sb-hover)}
+.nav-sub a.active{color:#fff;font-weight:700;border-left-color:#20c997;background:rgba(32,201,151,.12)}
+
+.main{flex:1;min-width:0;padding:6px 6px 24px 18px}
+.page{background:transparent}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;padding:4px 2px 14px}
+.eyebrow{font-size:12px;font-weight:700;color:var(--green-head);letter-spacing:.3px}
+.page-title{font-size:19px;font-weight:700;margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid transparent;border-radius:4px;padding:6px 12px;font-size:14px;font-family:inherit;cursor:pointer;background:#fff;line-height:1.4;white-space:nowrap}
+.btn svg{width:14px;height:14px;fill:currentColor}
+.btn-success{background:var(--green);color:#fff;font-weight:700}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-secondary{background:var(--gray);color:#fff}
+.btn-outline{border-color:var(--gray);color:#495057}
+.btn-outline-primary{border-color:var(--blue);color:var(--blue)}
+.btn-outline-primary:hover{background:var(--blue);color:#fff}
+.btn-outline-success{border-color:var(--green);color:var(--green)}
+.btn-outline-success:hover{background:var(--green);color:#fff}
+.btn-sm{padding:3px 8px;font-size:13px}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:4px;margin-bottom:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);padding:8px 10px}
+.stats b{display:block;font-size:17px}
+.stats span{font-size:12px;color:var(--muted)}
+.filter{padding:12px 10px}
+.filter label{font-size:12px;color:#495057;display:block;margin-bottom:6px}
+.filter .row{display:flex;gap:6px;align-items:center}
+.input,.select,textarea{border:1px solid #ced4da;border-radius:4px;padding:6px 10px;font-size:14px;font-family:inherit;color:var(--text);background:#fff;width:100%}
+.input:focus,.select:focus,textarea:focus{outline:none;border-color:#86b7fe;box-shadow:0 0 0 3px rgba(13,110,253,.15)}
+.input[readonly]{background:#e9ecef}
+.filter .input{max-width:760px;margin-right:14px}
+.card-head{display:flex;justify-content:space-between;align-items:center;padding:10px 10px 6px;font-weight:700;font-size:14px}
+.card-head small{font-weight:400;color:var(--muted);font-size:12px}
+
+table.grid{width:100%;border-collapse:collapse}
+table.grid th{text-align:left;font-weight:700;padding:9px 12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#f8f9fa;white-space:nowrap}
+table.grid td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.grid tr:last-child td{border-bottom:none}
+table.grid tbody tr:hover{background:#f8fbff}
+.col-op{width:140px}
+.nw{white-space:nowrap}
+.op{display:flex;gap:6px}
+.badge{display:inline-block;font-size:12px;font-weight:700;border-radius:10px;padding:2px 9px;margin-right:4px}
+.badge.g{background:var(--green-soft);color:var(--green)}
+.badge.b{background:var(--blue-soft);color:var(--blue)}
+.badge.sys{background:#5c636a;color:#fff;border-radius:3px;padding:2px 6px}
+.badge.cnt{background:#f1f3f5;color:#495057;font-weight:500}
+.badge.cnt.on{background:var(--blue-soft);color:var(--blue)}
+.badge.mod{display:inline-flex;align-items:center;gap:4px;background:#eef1f5;color:#2c3e50;border:1px solid #d5dbe3;border-radius:4px;padding:2px 7px;margin:2px 4px 2px 0;font-weight:500;white-space:nowrap}
+.badge.mod svg{width:12px;height:12px;fill:#2c3e50}
+.badge.mod em{font-style:normal;font-size:11px;color:var(--blue);font-weight:700;margin-left:2px}
+.st-on{color:var(--green);font-weight:700}
+.st-off{color:var(--muted);font-weight:700}
+.mono{font-family:Consolas,"Courier New",monospace;font-size:13px}
+.muted{color:var(--muted)}
+
+/* form */
+.form{padding:14px 18px 18px}
+.form-grid{display:grid;grid-template-columns:1fr 1.7fr 1.35fr;gap:18px 20px}
+.form label{display:block;color:var(--muted);margin-bottom:6px}
+.form label .req{color:var(--red)}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.form .full{grid-column:1/-1}
+textarea{min-height:78px;resize:vertical}
+.form-actions{margin-top:16px;display:flex;gap:10px}
+
+/* ===== 選單設定 ===== */
+.idcard{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;padding:14px 18px}
+.idcard .idno{width:52px;height:52px;border-radius:8px;background:var(--green-soft);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+.idcard .nm{font-size:16px;font-weight:700;display:flex;align-items:center;gap:6px}
+.idcard .ds{color:var(--muted);margin-top:4px;font-size:13px}
+.idcard .meter{text-align:right}
+.idcard .meter b{font-size:22px;color:var(--blue)}
+.idcard .meter span{display:block;font-size:12px;color:var(--muted)}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px}
+.toolbar .input{max-width:320px}
+.toolbar .sep{width:1px;height:24px;background:var(--border);margin:0 4px}
+.toolbar .right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.dirty{display:none;font-size:12px;color:#997404;background:var(--orange-soft);border-radius:4px;padding:3px 8px}
+.dirty.show{display:inline-block}
+
+.module{border:1px solid var(--border);border-radius:4px;background:#fff;margin-bottom:10px;overflow:hidden}
+.mhead{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#f8f9fa;cursor:pointer;user-select:none}
+.mhead .micon{width:30px;height:30px;border-radius:6px;background:var(--sb);color:#fff;display:flex;align-items:center;justify-content:center}
+.mhead .micon svg{width:15px;height:15px;fill:#fff}
+.mhead .mt{font-weight:700;font-size:15px}
+.mhead .mk{font-size:12px;color:var(--muted)}
+.mhead .mright{margin-left:auto;display:flex;align-items:center;gap:10px}
+.mhead .chev{width:14px;height:14px;fill:var(--muted);transition:transform .2s}
+.module.collapsed .chev{transform:rotate(-90deg)}
+.module.collapsed .mbody{display:none}
+.mbody table.grid th{background:#fff;font-size:13px;color:#495057}
+.mbody .col-ck{width:46px;text-align:center}
+.mbody tr.checked td{background:#f3f8ff}
+.empty{padding:16px;text-align:center;color:var(--muted);font-size:13px}
+input[type=checkbox]{width:16px;height:16px;accent-color:var(--blue);cursor:pointer;vertical-align:middle}
+.ck-wrap{display:flex;align-items:center;gap:8px}
+.chg{font-size:11px;font-weight:700;border-radius:3px;padding:1px 5px;margin-left:6px}
+.chg.add{background:var(--green-soft);color:var(--green)}
+.chg.del{background:#f8d7da;color:#b02a37}
+
+.footbar{position:sticky;bottom:0;background:#fff;border:1px solid var(--border);border-radius:4px;padding:10px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 -2px 8px rgba(0,0,0,.04)}
+.footbar .sum{font-size:13px;color:var(--muted)}
+.footbar .sum b{color:var(--text)}
+
+/* modal + toast */
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.mask.show{display:flex}
+.modal{background:#fff;border-radius:6px;width:720px;max-width:100%;max-height:90vh;display:flex;flex-direction:column}
+.modal-h{padding:12px 16px;border-bottom:1px solid var(--line);font-weight:700;font-size:16px}
+.modal-b{padding:14px 16px;overflow:auto}
+.modal-f{padding:10px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+.diff{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.diff .box{border:1px solid var(--line);border-radius:4px;padding:8px 10px}
+.diff .box h5{margin:0 0 6px;font-size:13px}
+.diff ul{margin:0;padding-left:18px;font-size:13px}
+pre.sql{background:#1e2733;color:#d8e1ea;border-radius:4px;padding:10px 12px;font-size:12px;line-height:1.55;overflow:auto;margin:0;white-space:pre}
+.toast{position:fixed;right:20px;top:20px;background:var(--green);color:#fff;padding:10px 16px;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,.15);display:none;z-index:60}
+.toast.show{display:block}
+.proto-note{font-size:12px;color:var(--muted);margin:8px 2px 0}
+
+@media (max-width:900px){
+  .app{flex-direction:column}
+  .sidebar{width:100%;height:auto;position:static}
+  .main{padding:10px 16px 24px}
+  .form-grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .tbl-scroll{overflow-x:auto}
+  table.grid{min-width:720px}
+  .idcard{grid-template-columns:auto 1fr}
+  .idcard .meter{grid-column:1/-1;text-align:left}
+  .diff{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ===== B2E 左側選單 ===== -->
+  <aside class="sidebar">
+    <div class="brand"><span class="logo"><svg viewBox="0 0 24 24"><path d="M12 13c-2.8 0-6 2.6-6 5.3C6 20 7.4 21 9 21c1.2 0 2-.6 3-.6s1.8.6 3 .6c1.6 0 3-1 3-2.7 0-2.7-3.2-5.3-6-5.3zM6.5 12a2.3 2.8 0 1 0 0-5.6 2.3 2.8 0 0 0 0 5.6zm11 0a2.3 2.8 0 1 0 0-5.6 2.3 2.8 0 0 0 0 5.6zM9.5 8a2.3 2.9 0 1 0 0-5.8 2.3 2.9 0 0 0 0 5.8zm5 0a2.3 2.9 0 1 0 0-5.8 2.3 2.9 0 0 0 0 5.8z"/></svg></span>B2E 後臺(UAT)</div>
+    <div class="profile"><div class="avatar"></div><div><small>歡迎,</small><b>測試者1號</b></div></div>
+    <nav id="nav"></nav>
+  </aside>
+
+  <main class="main" id="view"></main>
+</div>
+
+<!-- 存檔確認 -->
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="modal-h">確認儲存選單設定</div>
+    <div class="modal-b" id="modalBody"></div>
+    <div class="modal-f">
+      <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="commitSave()">確認儲存</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= 資料（來源：ECB2E-10756） ================= */
+const ICON = {
+  home:'<path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/>',
+  edit:'<path d="M3 17.2V21h3.8l11-11-3.8-3.8zM20.7 7a1 1 0 0 0 0-1.4l-2.3-2.3a1 1 0 0 0-1.4 0l-1.8 1.8 3.8 3.8z"/>',
+  cogs:'<path d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7 7 0 0 0-1.7-1L15 3h-4l-.4 2.7a7 7 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1c.5.4 1.1.7 1.7 1L11 21h4l.4-2.7c.6-.3 1.2-.6 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/>',
+  table:'<path d="M3 4h18v16H3zm2 2v4h6V6zm8 0v4h6V6zm-8 6v6h6v-6zm8 0v6h6v-6z"/>',
+  list:'<path d="M3 5h2v2H3zm4 0h14v2H7zM3 11h2v2H3zm4 0h14v2H7zm-4 6h2v2H3zm4 0h14v2H7z"/>',
+  factory:'<path d="M2 20V9l6 4V9l6 4V4h4v16z"/>',
+  shield:'<path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5z"/>',
+  chev:'<path d="M6 9l6 6 6-6z"/>',
+  mic:'<path d="M12 15a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v7a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V22h2v-3.1a7 7 0 0 0 6-6.9z"/>',
+  gift:'<path d="M20 7h-2.2A3 3 0 0 0 12 4.2 3 3 0 0 0 6.2 7H4v5h1v8h14v-8h1zM9 5a1 1 0 0 1 1 1v1H9a1 1 0 0 1 0-2zm6 0a1 1 0 0 1 0 2h-1V6a1 1 0 0 1 1-1zm-4 15H7v-8h4zm6 0h-4v-8h4z"/>',
+  comment:'<path d="M4 4h16v12H7l-3 3z"/>',
+  tint:'<path d="M12 2s-7 8-7 13a7 7 0 0 0 14 0c0-5-7-13-7-13z"/>',
+  menu:'<path d="M3 5h18v2H3zm0 6h18v2H3zm0 6h18v2H3z"/>',
+  save:'<path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7zm-5 16a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm3-10H5V5h10z"/>',
+  back:'<path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20z"/>'
+};
+const fa2icon = {'fa-microphone':'mic','fa-gift':'gift','fa-commenting':'comment','fa-tint':'tint'};
+const svg = (k,c='i') => `<svg class="${c}" viewBox="0 0 24 24">${ICON[k]}</svg>`;
+
+// USR_LineOaIdentity
+let identities = [
+  {Id:10, Name:'基本使用者', Description:'綁定LINEOA後只提供基本服務。', Status:1, UpdateOn:'2026/09/15 09:26', reserved:true},
+  {Id:20, Name:'全聯採購',   Description:'全聯商品部採購人員，推播通知，商品查詢，可銷量，加減量，鎖檔及商談回覆等作業。', Status:1, UpdateOn:'2026/09/15 09:26'},
+  {Id:30, Name:'全電商MD',   Description:'推播通知，商品查詢，可銷量，隱藏賣場開關等作業。', Status:1, UpdateOn:'2026/09/15 09:26'},
+  {Id:40, Name:'全聯行銷',   Description:'推播通知，商品查詢，可銷量等作業。', Status:1, UpdateOn:'2026/09/15 09:26'},
+  {Id:50, Name:'廠服',       Description:'發起商談，商品查詢，供應商查詢等作業。', Status:1, UpdateOn:'2026/09/15 09:26'},
+  {Id:90, Name:'小露SYSOP',  Description:'小露圖文選單', Status:1, UpdateOn:'2026/10/27 16:19'}
+];
+// USR_Module WHERE SystemType=5
+const modules = [
+  {Id:70010, Title:'小露_語音助理', Icon:'fa-microphone', PermissionKey:'70010'},
+  {Id:70020, Title:'小露_全聯預購', Icon:'fa-gift',       PermissionKey:'70020'},
+  {Id:70050, Title:'小露_商談服務', Icon:'fa-commenting', PermissionKey:'70050'},
+  {Id:70090, Title:'小露_SYSOP',    Icon:'fa-tint',       PermissionKey:'70090'}
+];
+// USR_Function（ModuleId 屬於上列 Module）
+const functions = [
+  {Id:7002001, ModuleId:70020, Title:'商品查詢(限)',     Action:'/lulu/SalesMix/ProductsList?key=7002001', DisplayOrder:5, PermissionKey:'7002001'},
+  {Id:7002002, ModuleId:70020, Title:'商品查詢(不限)',   Action:'/lulu/SalesMix/ProductsList?key=7002002', DisplayOrder:6, PermissionKey:'7002002'},
+  {Id:7002003, ModuleId:70020, Title:'特賣變價查詢(限)', Action:'/lulu/SalesMix/PriceHistory?key=7002003', DisplayOrder:7, PermissionKey:'7002003'},
+  {Id:7002004, ModuleId:70020, Title:'特賣變價查詢(不限)',Action:'/lulu/SalesMix/PriceHistory?key=7002004', DisplayOrder:8, PermissionKey:'7002004'}
+];
+// USR_Privilege WHERE SystemType=5（Id_LineOaIdentity → FunctionId）
+let privileges = [
+  {Id:491, FunctionId:7002001, Id_LineOaIdentity:10},
+  {Id:492, FunctionId:7002002, Id_LineOaIdentity:90},
+  {Id:493, FunctionId:7002003, Id_LineOaIdentity:10},
+  {Id:494, FunctionId:7002004, Id_LineOaIdentity:90}
+];
+let nextPrivId = 495;
+
+/* ================= 左側選單 ================= */
+const NAV = [
+  {t:'帳號管理(舊版)', ic:'home'},
+  {t:'商品品牌管理', ic:'edit'},
+  {t:'商品管理', ic:'edit'},
+  {t:'商品審核設定', ic:'cogs'},
+  {t:'訂單管理', ic:'table'},
+  {t:'分類管理', ic:'list'},
+  {t:'供應商管理', ic:'factory'},
+  {t:'系統管理', ic:'shield', open:true, sub:[{t:'LINEOA身份維護', active:true, href:'#list'}]}
+];
+document.getElementById('nav').innerHTML = NAV.map(n => `
+  <div class="nav-item ${n.open?'open':''}" onclick="this.classList.toggle('open')">${svg(n.ic)}<span>${n.t}</span>${svg('chev','i chev')}</div>
+  <div class="nav-sub">${(n.sub||[]).map(s=>`<a href="${s.href||'#'}" class="${s.active?'active':''}">${s.t}</a>`).join('') || '<a href="#" onclick="return false">（略）</a>'}</div>`).join('');
+
+/* ================= Router ================= */
+const view = document.getElementById('view');
+let menuState = null; // 選單設定頁暫存
+window.addEventListener('hashchange', route);
+function route(){
+  const h = location.hash || '#list';
+  const [p, q] = h.slice(1).split('?');
+  const id = q ? +new URLSearchParams(q).get('id') : null;
+  if(p==='edit') renderEdit(id);
+  else if(p==='new') renderEdit(null);
+  else if(p==='menu') renderMenu(id);
+  else renderList();
+  window.scrollTo(0,0);
+}
+const badgeOf = r => `<span class="badge ${r.reserved?'b':'g'}">${r.Name}</span>${r.reserved?'<span class="badge sys">系統保留</span>':''}`;
+// 該身份已設定的模組（有任一 Function 寫入 USR_Privilege 即算）
+const modsOf = id => {
+  const fids = new Set(privileges.filter(p=>p.Id_LineOaIdentity===id).map(p=>p.FunctionId));
+  return modules.map(m=>{
+    const all = functions.filter(f=>f.ModuleId===m.Id);
+    return {...m, total:all.length, n:all.filter(f=>fids.has(f.Id)).length};
+  }).filter(m=>m.n>0);
+};
+const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ================= 1. 查詢列表 ================= */
+let kw = '';
+function renderList(){
+  const rows = identities.filter(r => !kw || (r.Name+r.Description+r.Id).includes(kw));
+  const on = identities.filter(r=>r.Status===1).length;
+  view.innerHTML = `
+  <div class="page-head">
+    <div><div class="eyebrow">SYSTEM ADMINISTRATION</div><div class="page-title">LINEOA身份維護</div></div>
+    <a class="btn btn-success" href="#new">新增</a>
+  </div>
+  <div class="card stats">
+    <div><b>${identities.length}</b><span>身份數</span></div>
+    <div><b>${on}</b><span>啟用中</span></div>
+    <div><b>${identities.length-on}</b><span>停用中</span></div>
+  </div>
+  <div class="card filter">
+    <label>關鍵字</label>
+    <div class="row">
+      <input class="input" id="kw" placeholder="請輸入關鍵字" value="${esc(kw)}" onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="btn btn-outline" onclick="kw='';renderList()">重設</button>
+      <button class="btn btn-primary" onclick="doSearch()">查詢</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head">LINEOA身份維護 清單 <small>${demoOn?'<span class="badge" style="background:var(--orange-soft);color:#997404">示範資料已載入</span>':`<a href="javascript:loadDemo()" style="color:var(--blue);margin-right:10px">［預覽用］載入多模組示範資料</a>`}${rows.length} 筆</small></div>
+    <div class="tbl-scroll"><table class="grid">
+      <thead><tr><th class="col-op">操作</th><th>Id</th><th>身份名稱</th><th>說明</th><th>已設定模組</th><th>狀態</th><th>異動日期</th></tr></thead>
+      <tbody>${rows.map(r=>{return `
+        <tr>
+          <td><div class="op">
+            <a class="btn btn-sm btn-outline-primary" href="#edit?id=${r.Id}">編輯</a>
+            <a class="btn btn-sm btn-outline-success" href="#menu?id=${r.Id}">選單</a>
+          </div></td>
+          <td>${r.Id}</td>
+          <td class="nw">${badgeOf(r)}</td>
+          <td>${esc(r.Description)}</td>
+          <td>${modsOf(r.Id).map(m=>`<span class="badge mod" title="已勾選 ${m.n} / ${m.total} 個選單">${svg(fa2icon[m.Icon]||'menu')}${m.Title}<em>${m.n}/${m.total}</em></span>`).join('') || '<span class="muted" style="font-size:13px">未設定</span>'}</td>
+          <td class="nw ${r.Status?'st-on':'st-off'}">${r.Status?'啟用':'停用'}</td>
+          <td class="nw">${r.UpdateOn}</td>
+        </tr>`}).join('') || '<tr><td colspan="7" class="empty">查無資料</td></tr>'}
+      </tbody>
+    </table></div>
+  </div>`;
+}
+/* 預覽用：目前 USR_Function 只有 70020 有選單，無法呈現多模組。
+   這裡塞入標示「(示範)」的假選單，正式版不含此段。 */
+let demoOn = false;
+function loadDemo(){
+  if(demoOn) return; demoOn = true;
+  functions.push(
+    {Id:7001001, ModuleId:70010, Title:'語音摘要查詢(示範)', Action:'/lulu/Voice/Summary?key=7001001', DisplayOrder:1, PermissionKey:'7001001'},
+    {Id:7005001, ModuleId:70050, Title:'發起商談(示範)',     Action:'/lulu/Deal/Create?key=7005001',   DisplayOrder:1, PermissionKey:'7005001'},
+    {Id:7009001, ModuleId:70090, Title:'圖文選單切換(示範)', Action:'/lulu/Sysop/RichMenu?key=7009001', DisplayOrder:1, PermissionKey:'7009001'}
+  );
+  privileges.push(
+    {Id:nextPrivId++, FunctionId:7009001, Id_LineOaIdentity:90},
+    {Id:nextPrivId++, FunctionId:7001001, Id_LineOaIdentity:90},
+    {Id:nextPrivId++, FunctionId:7005001, Id_LineOaIdentity:50}
+  );
+  renderList(); toast('已載入示範資料（僅預覽，重新整理即清除）');
+}
+function doSearch(){ kw = document.getElementById('kw').value.trim(); renderList(); }
+
+/* ================= 編輯 / 新增 ================= */
+function renderEdit(id){
+  const r = identities.find(x=>x.Id===id) || {Id:'', Name:'', Description:'', Status:1};
+  const isNew = id==null;
+  view.innerHTML = `
+  <div class="card form">
+    <div class="eyebrow">SYSTEM ADMINISTRATION</div>
+    <div class="page-title" style="margin-bottom:14px">${isNew?'新增':'編輯'}LINEOA身份維護</div>
+    <div class="form-grid">
+      <div><label>Id ${isNew?'<span class="req">*</span>':''}</label>
+        <input class="input" id="fId" value="${r.Id}" ${isNew?'':'readonly'}>
+        <div class="hint">Id 為下游識別身份的鍵，${isNew?'建立後':''}不可修改。</div></div>
+      <div><label>身份名稱 <span class="req">*</span></label><input class="input" id="fName" value="${esc(r.Name)}"></div>
+      <div><label>狀態 <span class="req">*</span></label>
+        <select class="select" id="fStatus" ${r.reserved?'disabled':''}><option value="1" ${r.Status?'selected':''}>啟用</option><option value="0" ${!r.Status?'selected':''}>停用</option></select>
+        ${r.reserved?'<div class="hint">「基本使用者」為系統保留身份，不可停用或刪除。</div>':''}</div>
+      <div class="full"><label>說明</label><textarea id="fDesc">${esc(r.Description)}</textarea></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveIdentity(${isNew?'null':id})">儲存</button>
+      <a class="btn btn-secondary" href="#list">返回</a>
+    </div>
+  </div>`;
+}
+function saveIdentity(id){
+  const name = document.getElementById('fName').value.trim();
+  if(!name) return toast('請輸入身份名稱', true);
+  const now = nowStr();
+  if(id==null){
+    const nid = +document.getElementById('fId').value;
+    if(!nid || identities.some(x=>x.Id===nid)) return toast('Id 未填或已存在', true);
+    identities.push({Id:nid, Name:name, Description:document.getElementById('fDesc').value, Status:+document.getElementById('fStatus').value, UpdateOn:now});
+    identities.sort((a,b)=>a.Id-b.Id);
+  } else {
+    const r = identities.find(x=>x.Id===id);
+    Object.assign(r,{Name:name, Description:document.getElementById('fDesc').value, UpdateOn:now});
+    if(!r.reserved) r.Status = +document.getElementById('fStatus').value;
+  }
+  toast('已儲存'); location.hash = '#list';
+}
+
+/* ================= 3/4. 選單設定（獨立頁面） ================= */
+function renderMenu(id){
+  const idt = identities.find(x=>x.Id===id);
+  if(!idt){ location.hash='#list'; return; }
+  const orig = new Set(privileges.filter(p=>p.Id_LineOaIdentity===id).map(p=>p.FunctionId));
+  menuState = {id, orig, sel:new Set(orig), q:'', collapsed:new Set()};
+  view.innerHTML = `
+  <div class="page-head">
+    <div><div class="eyebrow">SYSTEM ADMINISTRATION ／ LINEOA身份維護</div><div class="page-title">LINEOA身份選單設定</div></div>
+    <button class="btn btn-secondary" onclick="leaveMenu()">${svg('back')}返回清單</button>
+  </div>
+  <div class="card idcard">
+    <div class="idno">${idt.Id}</div>
+    <div><div class="nm">${badgeOf(idt)}<span class="${idt.Status?'st-on':'st-off'}" style="font-size:13px">${idt.Status?'啟用':'停用'}</span></div>
+      <div class="ds">${esc(idt.Description)}</div></div>
+    <div class="meter"><b id="mSel">0</b> / <span style="display:inline;font-size:14px" id="mAll">0</span><span>已勾選選單</span></div>
+  </div>
+  <div class="card toolbar">
+    <input class="input" id="mq" placeholder="搜尋選單名稱、Id 或 Action" oninput="menuState.q=this.value.trim();drawModules()">
+    <span class="sep"></span>
+    <button class="btn btn-sm btn-outline-primary" onclick="bulk(true)">全選</button>
+    <button class="btn btn-sm btn-outline" onclick="bulk(false)">全部取消</button>
+    <button class="btn btn-sm btn-outline" onclick="foldAll(false)">展開全部</button>
+    <button class="btn btn-sm btn-outline" onclick="foldAll(true)">收合全部</button>
+    <div class="right"><span class="dirty" id="dirty">尚未儲存</span>
+      <button class="btn btn-sm btn-outline" onclick="resetMenu()">還原</button></div>
+  </div>
+  <div class="muted" style="font-size:12px;margin:0 2px 8px">資料來源：USR_Module / USR_Function（SystemType = 5）。勾選結果寫入 USR_Privilege（SystemType = 5，Id_LineOaIdentity = ${idt.Id}）。</div>
+  <div id="mods"></div>
+  <div class="footbar">
+    <button class="btn btn-primary" id="btnSave" onclick="openSave()">${svg('save')}儲存</button>
+    <button class="btn btn-secondary" onclick="leaveMenu()">返回</button>
+    <span class="sum" id="sum"></span>
+  </div>`;
+  drawModules();
+}
+function visibleFns(m){
+  const q = menuState.q.toLowerCase();
+  return functions.filter(f=>f.ModuleId===m.Id && (!q || (f.Title+f.Id+f.Action).toLowerCase().includes(q) || m.Title.toLowerCase().includes(q)))
+                  .sort((a,b)=>a.DisplayOrder-b.DisplayOrder);
+}
+function drawModules(){
+  const S = menuState;
+  document.getElementById('mods').innerHTML = modules.map(m=>{
+    const fns = visibleFns(m), all = functions.filter(f=>f.ModuleId===m.Id);
+    if(S.q && !fns.length) return '';
+    const n = all.filter(f=>S.sel.has(f.Id)).length;
+    return `
+    <div class="module ${S.collapsed.has(m.Id)?'collapsed':''}">
+      <div class="mhead" onclick="fold(${m.Id})">
+        <span class="ck-wrap" onclick="event.stopPropagation()">
+          <input type="checkbox" data-mod="${m.Id}" ${!all.length?'disabled':''} ${all.length&&n===all.length?'checked':''} onchange="toggleModule(${m.Id},this.checked)">
+        </span>
+        <span class="micon">${svg(fa2icon[m.Icon]||'menu')}</span>
+        <div><div class="mt">${m.Title}</div><div class="mk">Module Id ${m.Id}・PermissionKey ${m.PermissionKey}</div></div>
+        <div class="mright"><span class="badge cnt ${n?'on':''}">${n} / ${all.length}</span>${svg('chev','chev')}</div>
+      </div>
+      <div class="mbody">${all.length ? `
+        <div class="tbl-scroll"><table class="grid">
+          <thead><tr><th class="col-ck"></th><th>Function Id</th><th>選單名稱</th><th>Action</th><th>PermissionKey</th><th>排序</th></tr></thead>
+          <tbody>${fns.map(f=>{
+            const on=S.sel.has(f.Id), was=S.orig.has(f.Id);
+            const tag = on&&!was?'<span class="chg add">新增</span>':(!on&&was?'<span class="chg del">移除</span>':'');
+            return `<tr class="${on?'checked':''}" onclick="if(event.target.type!=='checkbox'){toggleFn(${f.Id})}" style="cursor:pointer">
+              <td class="col-ck"><input type="checkbox" ${on?'checked':''} onchange="toggleFn(${f.Id})"></td>
+              <td class="mono">${f.Id}</td><td>${f.Title}${tag}</td>
+              <td class="mono muted">${f.Action}</td><td class="mono">${f.PermissionKey}</td><td>${f.DisplayOrder}</td></tr>`}).join('')}
+          </tbody></table></div>` : '<div class="empty">此 Module 尚未建立選單（USR_Function）</div>'}
+      </div>
+    </div>`}).join('') || '<div class="card empty">查無符合的選單</div>';
+  // 半選狀態
+  modules.forEach(m=>{
+    const all = functions.filter(f=>f.ModuleId===m.Id), n = all.filter(f=>S.sel.has(f.Id)).length;
+    const el = document.querySelector(`input[data-mod="${m.Id}"]`);
+    if(el) el.indeterminate = n>0 && n<all.length;
+  });
+  updateSummary();
+}
+function diff(){ const S=menuState;
+  return {add:[...S.sel].filter(x=>!S.orig.has(x)), del:[...S.orig].filter(x=>!S.sel.has(x))}; }
+function updateSummary(){
+  const S=menuState, d=diff(), dirty=d.add.length+d.del.length>0;
+  document.getElementById('mSel').textContent = S.sel.size;
+  document.getElementById('mAll').textContent = functions.length;
+  document.getElementById('dirty').classList.toggle('show', dirty);
+  document.getElementById('btnSave').disabled = !dirty;
+  document.getElementById('sum').innerHTML = dirty
+    ? `本次異動：新增 <b>${d.add.length}</b> 項、移除 <b>${d.del.length}</b> 項`
+    : '尚無異動';
+}
+function toggleFn(fid){ const s=menuState.sel; s.has(fid)?s.delete(fid):s.add(fid); drawModules(); }
+function toggleModule(mid,on){ functions.filter(f=>f.ModuleId===mid).forEach(f=>on?menuState.sel.add(f.Id):menuState.sel.delete(f.Id)); drawModules(); }
+function bulk(on){ (menuState.q? modules.flatMap(visibleFns) : functions).forEach(f=>on?menuState.sel.add(f.Id):menuState.sel.delete(f.Id)); drawModules(); }
+function fold(mid){ const c=menuState.collapsed; c.has(mid)?c.delete(mid):c.add(mid); drawModules(); }
+function foldAll(col){ menuState.collapsed = new Set(col?modules.map(m=>m.Id):[]); drawModules(); }
+function resetMenu(){ menuState.sel = new Set(menuState.orig); drawModules(); }
+function leaveMenu(){
+  const d=diff();
+  if(d.add.length+d.del.length && !confirm('選單設定尚未儲存，確定要離開？')) return;
+  location.hash='#list';
+}
+const fnName = id => (functions.find(f=>f.Id===id)||{}).Title;
+function openSave(){
+  const d=diff(), id=menuState.id;
+  const sql = ['BEGIN TRAN;'];
+  if(d.del.length) sql.push(
+`DELETE FROM dbo.USR_Privilege
+ WHERE SystemType = 5
+   AND Id_LineOaIdentity = ${id}
+   AND FunctionId IN (${d.del.join(', ')});`);
+  d.add.forEach(f=>sql.push(
+`INSERT INTO dbo.USR_Privilege (MemberId, FunctionId, RoleId, DepartmentNo, SystemType, Id_LineOaIdentity)
+VALUES (NULL, ${f}, NULL, NULL, 5, ${id});`));
+  sql.push('COMMIT;');
+  document.getElementById('modalBody').innerHTML = `
+    <div class="diff">
+      <div class="box"><h5 style="color:var(--green)">新增 ${d.add.length} 項</h5><ul>${d.add.map(f=>`<li>${f} ${fnName(f)}</li>`).join('')||'<li class="muted">無</li>'}</ul></div>
+      <div class="box"><h5 style="color:#b02a37">移除 ${d.del.length} 項</h5><ul>${d.del.map(f=>`<li>${f} ${fnName(f)}</li>`).join('')||'<li class="muted">無</li>'}</ul></div>
+    </div>
+    <div class="muted" style="font-size:12px;margin-bottom:6px">寫入 USR_Privilege（差異比對：只新增／刪除有變動的列，未變動的列保留原 Id）</div>
+    <pre class="sql">${sql.join('\n')}</pre>`;
+  document.getElementById('mask').classList.add('show');
+}
+function closeModal(){ document.getElementById('mask').classList.remove('show'); }
+function commitSave(){
+  const d=diff(), id=menuState.id;
+  privileges = privileges.filter(p=>!(p.Id_LineOaIdentity===id && d.del.includes(p.FunctionId)));
+  d.add.forEach(f=>privileges.push({Id:nextPrivId++, FunctionId:f, Id_LineOaIdentity:id}));
+  const r = identities.find(x=>x.Id===id); r.UpdateOn = nowStr();
+  menuState.orig = new Set(menuState.sel);
+  closeModal(); drawModules(); toast('選單設定已儲存');
+}
+
+/* ================= utils ================= */
+function nowStr(){ const d=new Date(),p=n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; }
+let tt; function toast(msg,err){ const t=document.getElementById('toast'); t.textContent=msg; t.style.background=err?'var(--red)':'var(--green)'; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),2000); }
+
+route();
+</script>
+</body>
+</html>
