@@ -242,6 +242,13 @@ ol.rules{margin:0;padding-left:20px;display:grid;gap:6px}
 .tm.me{background:#e6f8ee;justify-self:end;border-top-left-radius:12px;border-top-right-radius:3px}
 .tm.sys{background:transparent;justify-self:center;color:#6b7480;font-size:11px;padding:0}
 .tm .who{display:block;font-size:10.5px;color:#6b7480}
+.unit{font-size:10.5px;border-radius:4px;padding:0 6px;white-space:nowrap;border:1px solid currentColor}
+.unit.u-子單{color:#1d5fc4}.unit.u-商品{color:#0b7a3c}.unit.u-功能{color:#8a5200}
+.lk{font-size:10.5px;border-radius:4px;padding:0 6px;white-space:nowrap;background:#fdecea;color:#c0392b;flex-shrink:0}
+.evs.ing{background:#e6f8ee;color:#0b7a3c}.evs.todo{background:#fff3df;color:#8a5200}.evs.done{background:#f1f1f1;color:#888}
+.evt{display:flex;gap:6px;flex-wrap:wrap;margin-top:3px}
+.frow{display:grid;grid-template-columns:30px 1fr;gap:6px;align-items:center}.frow>span{font-size:11.5px;color:#6b7480}
+.tli{grid-template-columns:1fr}.dl{font:11.5px var(--f-mono);color:#33404c}.dl span{font-family:var(--f-body);color:#6b7480;margin-right:6px}
 .pblog{font:11.5px var(--f-mono);color:var(--muted)}
 .fn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
 .fn{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
@@ -254,7 +261,7 @@ ol.rules{margin:0;padding-left:20px;display:grid;gap:6px}
 
 <div class="wrap">
 <header>
-  <div class="eyebrow">小露 LINEOA · B2E 業務通道 · 功能操作示意 v1.0 · 2026-11-09</div>
+  <div class="eyebrow">小露 LINEOA · B2E 業務通道 · 功能操作示意 v1.2 · 2026-11-19</div>
   <h1>小露 LINEOA 功能示意</h1>
   <div class="author">作者：chimoon 高千月 · 全電商技術處</div>
   <p class="lede">涵蓋查詢商品、查詢特賣、代理加減量、活動鎖檔、全聯檔期、商談回覆。切換身份後點下方選單操作，右側同步顯示小露與 B2E 的呼叫與回應。商品取自 SampleProduct.xlsx，檔期、變價、商談為示例資料（今天以 2026-11-09 計）。</p>
@@ -303,19 +310,19 @@ ol.rules{margin:0;padding-left:20px;display:grid;gap:6px}
   <h2>功能規格摘要</h2>
   <div class="fn-grid">
     <div class="fn"><h3>查詢特賣 <span class="rl">採購・廠服</span></h3><p>查詢商品在各檔期的變價活動（特賣）。對應 B2E「全聯預購變價查詢」。</p>
-      <ul><li>依商品：四種編號擇一；依檔期：列出該檔期的變價（採購只看自己線別）。</li><li>列表：變價狀態、檔期、活動起迄、原價／活動售價、提貨方式、銷售門市、限制數量。</li><li>明細另含取貨門市（店群）、提貨起迄、N特、出貨、活動銷售碼、紙本訂購碼。</li><li>不顯示成本與折讓。採購可從明細直接鎖檔。</li></ul>
+      <ul><li>依商品：四種編號擇一；依檔期：列出該檔期的變價（採購只看自己線別）。</li><li>變價狀態：1 待生效、2 已變價、4 已作廢、10 已中止。</li><li>只顯示<b>近期 10 筆</b>（依活動起日新到舊），超過時提示總筆數。</li><li>列表：變價狀態、檔期、活動起迄、原價／活動售價、提貨方式、銷售門市、限制數量。</li><li>明細另含取貨門市（店群）、提貨起迄、N特、出貨、活動銷售碼、紙本訂購碼。</li><li>不顯示成本與折讓。採購可從明細直接鎖檔。</li></ul>
       <div class="api">POST /api/lineoa/1.0/price-changes/query</div></div>
     <div class="fn"><h3>代理加減量 <span class="rl">限採購</span></h3><p>採購代理供應商送出可銷量加減量申請，並自動核可（autopass）。對應 B2E「預購可銷量異動審核」。</p>
-      <ul><li>先選商品（限自己線別），顯示目前可銷量、7／30 日銷量、進行中限制數量。</li><li>選加量／減量、數字鍵盤輸入數量、選申請原因；即時預估核可後可銷量，≤0 標示「將歸零」。</li><li>依核可當下庫存加減；庫存線上線下共用；有限制數量的變價會重置數量。</li><li>帶冪等鍵送出，不自動重試；供應商收到通知，B2E 記錄申請人與核可人皆為該採購。</li></ul>
+      <ul><li>先選商品（限自己線別），顯示目前可銷量、7／30 日銷量、進行中限制數量。</li><li>選加量／減量、數字鍵盤輸入數量、選申請原因；即時預估核可後可銷量，≤0 標示「將歸零」。</li><li>依核可當下庫存加減；庫存線上線下共用；此作業只追加或調整當下的可銷量，不影響提品變價的限制數量。</li><li>帶冪等鍵送出，不自動重試；供應商收到通知，B2E 記錄申請人與核可人皆為該採購。</li></ul>
       <div class="api">POST /api/lineoa/1.0/purchase-adjustments</div></div>
     <div class="fn"><h3>活動鎖檔 <span class="rl">限採購</span></h3><p>鎖定變價活動讓它失效。對應 B2E「全聯檔期變價狀態(鎖檔)」。</p>
-      <ul><li>依檔期或商品編號列出可鎖檔的變價（待生效、已變價），可多選；已鎖檔、已過期不可選。</li><li>鎖檔原因必填；送出前二次確認。</li><li>全電商立即失效；線下門市隔天失效（待 POS 同步）；無法復原，需重新提報變價。</li></ul>
+      <ul><li>只列變價狀態 1 待生效、2 已變價的變價（活動未過期），可多選。</li><li>鎖檔原因必填；送出前二次確認。</li><li>鎖檔後變價狀態改為 10 已中止。全電商立即失效；線下門市隔天失效（待 POS 同步）；無法復原，需重新提報變價。</li></ul>
       <div class="api">POST /api/lineoa/1.0/price-changes/lock</div></div>
-    <div class="fn"><h3>全聯檔期 <span class="rl">採購・廠服</span></h3><p>查看行銷檔期清單與狀態。對應 B2E「全聯行銷檔期」，LINE 端唯讀。</p>
-      <ul><li>狀態：提品中、進行中、未開始、已結束；可篩選。</li><li>明細：檔期代碼、名稱、變價期間、提品期間、開放提品、各狀態變價筆數（採購為自己線別）。</li><li>可直接跳到該檔期的特賣清單。調整提品期間、開放提品仍在 B2E 操作。</li></ul>
+    <div class="fn"><h3>全聯檔期 <span class="rl">採購・廠服</span></h3><p>查看行銷檔期的活動與報名期間。對應 B2E「全聯行銷檔期」，LINE 端唯讀。</p>
+      <ul><li>日期：活動起迄、報名起迄。</li><li>狀態分兩列，可各自篩選：報名已結束／報名進行中／報名未開始；活動已過期／活動進行中／活動未開始。</li><li>明細另含各變價狀態筆數（採購為自己線別）；可直接跳到該檔期的特賣清單。</li><li>調整報名起迄仍在 B2E 操作。</li></ul>
       <div class="api">GET /api/lineoa/1.0/marketing-events</div></div>
     <div class="fn"><h3>商談回覆 <span class="rl">限採購</span></h3><p>回覆供應商在 SCM 發出的商談。對應 B2E「全聯商談查詢」與 SCM「廠服商談作業」。</p>
-      <ul><li>新商談由小露推播通知；列表可篩待回覆／已回覆／已結案，未讀以紅點標示。</li><li>商談含供應商、兩層分類、主旨、關聯訂單或商品；關聯商品可直接查特賣。</li><li>回覆 500 字內，可用快速片語；可「回覆並結案」，結案後不能再回覆。</li><li>只列指派給該採購的商談；回覆後通知供應商。</li></ul>
+      <ul><li>新商談由小露推播通知；列表可篩待回覆／已回覆／已結案，未讀以紅點標示。</li><li>每筆商談只有一個<b>商談類型</b>，三擇一：單一子單（TS／AS／ES）、單一商品（全聯貨號／條碼／平台編號…）、單一功能（貨號申請／加減量／變價…）。不會一筆商談涵蓋多張訂單或多個商品。</li><li>子單與商品類可直接查看該商品的特賣。</li><li>回覆 500 字內，可用快速片語；可「回覆並結案」，結案後不能再回覆。</li><li>只列指派給該採購的商談；回覆後通知供應商。</li></ul>
       <div class="api">GET /api/lineoa/1.0/inquiries<br>POST /api/lineoa/1.0/inquiries/{no}/replies</div></div>
     <div class="fn"><h3>共用規則</h3>
       <ul><li>圖文選單用 Postback 觸發，經事件路由檢查綁定與身份後開啟對應 LIFF。</li><li>所有呼叫走小露 → B2E 業務通道，帶員編；B2E 每次重查身份與線別。</li><li>寫入類（代理加減量、活動鎖檔、商談回覆）帶 Idempotency-Key，失敗不自動重試，完成後在聊天室留存結果卡片。</li><li>商品編號一律用畫面數字鍵盤輸入；僅限預購與箱購商品。</li><li>「發起商談」（廠服）不在本版範圍。</li></ul></div>
@@ -363,48 +370,65 @@ ol.rules{margin:0;padding-left:20px;display:grid;gap:6px}
   /* ---------- 行銷檔期（示例；今天 2026-11-09） ---------- */
   const TODAY='2026-11-09';
   const EVENTS=[
-    {code:'A162',name:'2026中秋預購',pS:'2026-07-15',pE:'2026-09-25',sS:'2026-06-01',sE:'2026-07-10',open:false},
-    {code:'A168',name:'2027年菜',pS:'2026-10-01',pE:'2027-01-31',sS:'2026-08-15',sE:'2026-09-30',open:false},
-    {code:'A171',name:'冬至暖心',pS:'2026-11-15',pE:'2026-12-22',sS:'2026-09-01',sE:'2026-11-10',open:true},
-    {code:'A175',name:'2027春節伴手禮',pS:'2027-01-05',pE:'2027-02-10',sS:'2026-10-15',sE:'2026-12-05',open:true},
-    {code:'A180',name:'2027母親節',pS:'2027-04-01',pE:'2027-05-10',sS:'2027-01-15',sE:'2027-03-10',open:false}
+    {code:'A140',name:'2026春節伴手禮',pS:'2026-01-05',pE:'2026-02-10',sS:'2025-10-15',sE:'2025-12-05'},
+    {code:'A145',name:'2026母親節',pS:'2026-04-01',pE:'2026-05-10',sS:'2026-01-15',sE:'2026-03-10'},
+    {code:'A150',name:'2026端午',pS:'2026-05-01',pE:'2026-06-19',sS:'2026-02-15',sE:'2026-04-10'},
+    {code:'A162',name:'2026中秋預購',pS:'2026-07-15',pE:'2026-09-25',sS:'2026-06-01',sE:'2026-07-10'},
+    {code:'A168',name:'2027年菜',pS:'2026-10-01',pE:'2027-01-31',sS:'2026-08-15',sE:'2026-09-30'},
+    {code:'A171',name:'冬至暖心',pS:'2026-11-15',pE:'2026-12-22',sS:'2026-09-01',sE:'2026-11-10'},
+    {code:'A175',name:'2027春節伴手禮',pS:'2027-01-05',pE:'2027-02-10',sS:'2026-10-15',sE:'2026-12-05'},
+    {code:'A180',name:'2027母親節',pS:'2027-04-01',pE:'2027-05-10',sS:'2027-01-15',sE:'2027-03-10'}
   ];
-  function evState(e){if(TODAY>e.pE)return'已結束';if(TODAY>=e.pS)return'進行中';if(e.open&&TODAY>=e.sS&&TODAY<=e.sE)return'提品中';return'未開始'}
+  /* 檔期狀態分兩列：報名（sS~sE）、活動（pS~pE） */
+  function regState(e){return TODAY>e.sE?'報名已結束':TODAY>=e.sS?'報名進行中':'報名未開始'}
+  function actState(e){return TODAY>e.pE?'活動已過期':TODAY>=e.pS?'活動進行中':'活動未開始'}
+  const stCls=t=>t.endsWith('進行中')?'ing':t.endsWith('未開始')?'todo':'done';
+  const stTag=t=>`<span class="evs ${stCls(t)}">${t}</span>`;
+  const evTags=e=>`<span class="evt">${stTag(regState(e))}${stTag(actState(e))}</span>`;
   const evBy=c=>EVENTS.find(e=>e.code===c);
 
   /* ---------- 變價活動（特賣）：依商品線別決定示例檔期 ---------- */
   const h=s=>[...s].reduce((a,c)=>(a*31+c.charCodeAt(0))%9973,7);
   const STORES=['全區門市','北北基宜門市','桃竹苗門市','中彰投門市','雲嘉南門市','高屏門市'];
-  const PCS=[];
+  /* 變價狀態：1 待生效、2 已變價、4 已作廢、10 已中止（鎖檔後為 10） */
+  const PCODE={'待生效':1,'已變價':2,'已作廢':4,'已中止':10};
+  const PCS=[];let seq=0;
   PRODUCTS.forEach((p,i)=>{
     if(p.type==='一般')return;
     const k=h(p.pf);
-    const evs=p.line==='06'?['A162','A175']:p.line==='05'?['A168','A171']:['A168'];
+    const evs=p.line==='06'?['A140','A145','A162','A175']:p.line==='05'?['A140','A145','A150','A168','A171']:['A150','A168'];
     evs.forEach((c,j)=>{
       const e=evBy(c);
       const home=p.line==='03'||p.type==='箱購'||k%5===0;
-      let st=TODAY>e.pE?'已過期':TODAY>=e.pS?'已變價':'待生效';
-      if(k%11===j)st='已鎖檔';
-      PCS.push({id:'PC'+c+p.pf,px:p.px,pf:p.pf,ev:c,status:st,market:p.market,price:j?Math.round(p.price*0.95):p.price,
+      const mk=(st,n)=>PCS.push({id:'PC'+c+p.pf+n,seq:seq++,px:p.px,pf:p.pf,ev:c,status:st,market:p.market,price:j%2?Math.round(p.price*0.95):p.price,
         nte:k%4===0?[{n:2,price:Math.round(p.price*2*0.92)}]:[],ship:p.line==='03'||p.line==='04'?'物流':(k%3?'物流':'廠出'),
         take:home?'宅配':'門市',sale:home?'全台本島（宅配地區 04）':STORES[k%STORES.length],pick:home?'—（宅配）':'店群 '+(k%6)+'｜'+STORES[k%STORES.length],
-        tS:home?'—':addDays(e.pE,-10+(k%5)),tE:home?'—':addDays(e.pE,5),limit:k%3===0?null:(200+(k%8)*50),saleCode:c.slice(1)+'0'+p.px+String(1000+k%9000).slice(0,3),sno:String(1000+(k*7)%9000)});
+        tS:home?'—':addDays(e.pE,-10+(k%5)),tE:home?'—':addDays(e.pE,5),limit:k%3===0?null:(200+(k%8)*50),saleCode:c.slice(1)+'0'+p.px+String(100+n),sno:String(1000+(k*7+n)%9000)});
+      if(k%3===0&&j===0)mk('已作廢',0);
+      if(k%3===0)mk('已作廢',1);                       // 同檔期先作廢、再重新提報
+      mk(k%11===j?'已中止':TODAY>=e.pS?'已變價':'待生效',2);
     });
   });
-  function addDays(d,n){const t=new Date(d+'T00:00:00');t.setDate(t.getDate()+n);return t.toISOString().slice(0,10)}
-  const pcsOf=p=>PCS.filter(x=>x.pf===p.pf);
+  function addDays(d,n){const t=new Date(d+'T00:00:00Z');t.setUTCDate(t.getUTCDate()+n);return t.toISOString().slice(0,10)}
+  const recent=(a,b)=>evBy(b.ev).pS.localeCompare(evBy(a.ev).pS)||b.seq-a.seq;   // 近期：活動起日新→舊
+  const pcsOf=p=>PCS.filter(x=>x.pf===p.pf).sort(recent);
+  const LIMIT=10;
 
   /* ---------- 商談（示例：寄給採購王小明，線別 05／06） ---------- */
+  /* 商談類型三擇一且只能一筆：子單（TS／AS／ES）、商品、功能 */
   const INQ=[
-    {id:'IQ20261109003',sup:'1431 善美',cat:'訂單',sub:'延遲出貨',subject:'中秋禮盒 3 筆訂單需延後出貨',ref:{t:'訂單',v:'AS2609150012 等 3 筆'},pf:'00473447',time:'2026-11-09 09:42',st:'待回覆',unread:true,
-      msgs:[{who:'供應商',name:'善美 陳小姐',t:'2026-11-09 09:42',txt:'唐璞土鳳梨酥禮盒因包材到貨延遲，AS2609150012、AS2609150031、AS2609150047 三筆宅配單預計延後 2 天出貨，請問是否可行？'}]},
-    {id:'IQ20261108011',sup:'1431 善美',cat:'商品',sub:'規格／圖片',subject:'粽子禮盒主圖更新',ref:{t:'商品',v:'05010254 饗城香蓮八寶養生粽'},pf:'00441107',time:'2026-11-08 16:20',st:'待回覆',unread:true,
+    {id:'IQ20261109003',sup:'1431 善美',unit:{t:'子單',v:'AS2609150012'},topic:'延遲出貨',subject:'宅配單需延後 2 天出貨',pf:'00473447',time:'2026-11-09 09:42',st:'待回覆',unread:true,
+      msgs:[{who:'供應商',name:'善美 陳小姐',t:'2026-11-09 09:42',txt:'訂單 AS2609150012（唐璞土鳳梨酥禮盒，宅配）因包材到貨延遲，預計延後 2 天出貨，請問是否可行？'}]},
+    {id:'IQ20261108011',sup:'1431 善美',unit:{t:'商品',v:'05010254'},topic:'規格／圖片',subject:'粽子禮盒主圖更新',pf:'00441107',time:'2026-11-08 16:20',st:'待回覆',unread:true,
       msgs:[{who:'供應商',name:'善美 林先生',t:'2026-11-08 16:20',txt:'香蓮八寶養生粽包裝改版，已上傳新主圖，麻煩採購協助確認是否可替換。'}]},
-    {id:'IQ20261107005',sup:'1188 家裡蹲',cat:'變價',sub:'限制數量',subject:'冬至檔限制數量想調高',ref:{t:'商品',v:'20876543 北海道鮮乳奶油捲'},pf:'00051231',time:'2026-11-07 11:05',st:'已回覆',unread:false,
-      msgs:[{who:'供應商',name:'家裡蹲 王經理',t:'2026-11-07 11:05',txt:'冬至暖心檔限制數量目前 200，預估需求較高，想調高到 400。'},{who:'採購',name:'王小明',t:'2026-11-07 14:30',txt:'檔期開始後限制數量無法修改，請在 11/14 前重新提報變價，我會優先審核。'}]},
-    {id:'IQ20261102002',sup:'1431 善美',cat:'系統',sub:'SCM 操作',subject:'批次變價上傳失敗',ref:{t:'—',v:'—'},pf:null,time:'2026-11-02 10:12',st:'已結案',unread:false,
+    {id:'IQ20261107008',sup:'1431 善美',unit:{t:'功能',v:'加減量'},topic:'審核進度',subject:'加減量申請送審後未收到結果通知',pf:null,time:'2026-11-07 15:26',st:'待回覆',unread:false,
+      msgs:[{who:'供應商',name:'善美 陳小姐',t:'2026-11-07 15:26',txt:'11/5 在 SCM 送出的加減量申請，到現在還沒收到審核結果通知，想確認加減量的審核流程與通知方式。'}]},
+    {id:'IQ20261105004',sup:'1431 善美',unit:{t:'子單',v:'TS2610280057'},topic:'門市取貨',subject:'門市取貨日可否提前',pf:'00055987',time:'2026-11-05 11:05',st:'已回覆',unread:false,
+      msgs:[{who:'供應商',name:'善美 王經理',t:'2026-11-05 11:05',txt:'門市訂單 TS2610280057（冰心綠豆糕禮盒）顧客希望提前 3 天取貨，請問是否可以調整？'},{who:'採購',name:'王小明',t:'2026-11-05 14:30',txt:'門市取貨日依活動提貨起迄，單筆訂單無法提前，請門市協助說明。'}]},
+    {id:'IQ20261102002',sup:'1431 善美',unit:{t:'功能',v:'變價'},topic:'SCM 操作',subject:'批次變價上傳失敗',pf:null,time:'2026-11-02 10:12',st:'已結案',unread:false,
       msgs:[{who:'供應商',name:'善美 陳小姐',t:'2026-11-02 10:12',txt:'批次變價檔上傳顯示格式錯誤。'},{who:'採購',name:'王小明',t:'2026-11-02 13:40',txt:'活動銷售名稱超過 50 字，已協助修正，請重新上傳。'},{who:'系統',name:'小露',t:'2026-11-03 09:00',txt:'採購已結案。'}]}
   ];
+  const unitTxt=x=>x.unit.t+' '+x.unit.v;
   const REASONS=['檔期加開','補貨到貨','熱銷追加','原料不足','廠商產能調整','停產減量','其他'];
   const LOCK_REASONS=['商品品質問題','供應商無法供貨','價格設定錯誤','檔期取消'];
 
@@ -519,7 +543,9 @@ ol.rules{margin:0;padding-left:20px;display:grid;gap:6px}
   }
   const pHead=p=>`<div class="ph">${p.img?`<img src="${p.img}" alt="">`:'<div class="noimg sm">無圖</div>'}<div><b>${esc(p.salesName)}</b><span class="mono">${p.px}・${p.pf}</span><span>${esc(p.cls)}</span></div></div>`;
   const kvRows=rows=>`<div class="kv">${rows.map(r=>r?`<div class="k">${r[0]}</div><div class="v ${r[2]||''}">${r[2]==='raw'?r[1]:esc(r[1])}</div>`:'<div class="sep"></div>').join('')}</div>`;
-  const pcBadge=s=>`<span class="pcs ${({'待生效':'w','已變價':'g','已鎖檔':'r','已過期':'x'})[s]}">${s}</span>`;
+  const pcBadge=s=>`<span class="pcs ${({'待生效':'w','已變價':'g','已作廢':'x','已中止':'r'})[s]}">${PCODE[s]} ${s}</span>`;
+  const lockTag=()=>'';
+  const canLock=x=>['待生效','已變價'].includes(x.status)&&TODAY<=evBy(x.ev).pE;
 
   /* ================= 各功能 ================= */
   const APPS={};
@@ -532,7 +558,7 @@ ol.rules{margin:0;padding-left:20px;display:grid;gap:6px}
         bd.innerHTML=kvRows([['全聯貨號',p.px+(p.sup===FRESH_SUP&&p.fc?'（生鮮呼出碼 '+p.fc+'）':'')],['全聯條碼',p.bc],['平台編號',p.pf],['全聯分類',p.cls,'txt'],['供應商',p.sup+' '+p.supName,'txt'],null,
           ['商品名稱',p.name,'txt'],['銷售稅別',TAX[p.tax]??p.tax,'txt'],null,
           ['品牌',p.brand,'txt'],['銷售名稱',p.salesName,'txt'],['銷售規格',p.spec,'txt'],['最新市價','$'+fmt(p.market)],['最新售價','$'+fmt(p.price)],['商品採購',p.buyer,'txt'],['商品主管',p.boss,'txt'],null,
-          ['銷售狀態',`<span class="stp s${p.status}">${p.status} ${STATUS[p.status]}</span>`,'raw'],['變價活動',pcsOf(p).filter(x=>x.status==='已變價').map(x=>evBy(x.ev).name).join('、')||'—','txt'],['最新可銷量',fmt(p.avail),'big']])
+          ['銷售狀態',`<span class="stp s${p.status}">${p.status} ${STATUS[p.status]}</span>`,'raw'],['變價活動',pcsOf(p).filter(x=>x.status==='已變價'&&TODAY<=evBy(x.ev).pE).map(x=>evBy(x.ev).name).join('、')||'—','txt'],['最新可銷量',fmt(p.avail),'big']])
           +`<div class="mainimg"><span class="lbl">商品主圖</span>${p.img?`<img src="${p.img}" alt="商品主圖">`:'<div class="noimg">無主圖</div>'}</div>`+(r.dup>1?`<div class="note">此編號對應 ${r.dup} 筆平台商品，已顯示可銷售的一筆。要查其他筆請改用平台編號。</div>`:'');
         ft.innerHTML=`<button class="btn sec" id="b1">查詢特賣</button><button class="btn pri" id="b2">再查一筆</button>`;$('b1').onclick=()=>{app='查詢特賣';APPS['查詢特賣'].showProduct(p)};$('b2').onclick=()=>APPS['查詢商品'].start()}});
   }})}};
@@ -542,36 +568,36 @@ ol.rules{margin:0;padding-left:20px;display:grid;gap:6px}
     mode:'prod',
     start(){const me=this;
       const tabs=`<div class="tabs"><button aria-pressed="${me.mode==='prod'}" id="tP">依商品</button><button aria-pressed="${me.mode==='ev'}" id="tE">依檔期</button></div>`;
-      if(me.mode==='prod'){productPicker({title:'查詢特賣',btn:'查詢變價活動',extraTop:tabs,hint:'查詢此商品所有檔期的變價活動（特賣）',samples:[byPf('00441107'),byPf('00473447'),byPf('00044473'),byPf('00051231'),byPf('00322419')],onSubmit:(t,v)=>me.byProduct(t,v),after:()=>{$('tP').onclick=()=>{me.mode='prod';me.start()};$('tE').onclick=()=>{me.mode='ev';me.start()}}});return}
-      else{setHead('查詢特賣');const list=EVENTS.filter(e=>evState(e)!=='已結束'||e.code==='A162');
-        bd.innerHTML=idBadge()+tabs+`<span class="lbl">選擇檔期</span><div class="evlist">${list.map(e=>`<button class="evi" data-c="${e.code}"><span class="mono">${e.code}</span><b>${esc(e.name)}</b><span>${e.pS} ~ ${e.pE}</span><span class="evs ${evState(e)}">${evState(e)}</span></button>`).join('')}</div>`+(u().lines?`<div class="note">只列出您負責線別的變價活動。</div>`:'');
+      if(me.mode==='prod'){productPicker({title:'查詢特賣',btn:'查詢變價活動',extraTop:tabs,hint:'查詢此商品所有檔期的變價活動（特賣）',samples:[PRODUCTS.find(p=>p.line==='05'&&pcsOf(p).length>LIMIT),byPf('00441107'),byPf('00473447'),byPf('00044473'),byPf('00051231'),byPf('00322419')],onSubmit:(t,v)=>me.byProduct(t,v),after:()=>{$('tP').onclick=()=>{me.mode='prod';me.start()};$('tE').onclick=()=>{me.mode='ev';me.start()}}});return}
+      else{setHead('查詢特賣');const list=EVENTS.filter(e=>actState(e)!=='活動已過期'||e.code==='A162');
+        bd.innerHTML=idBadge()+tabs+`<span class="lbl">選擇檔期</span><div class="evlist">${list.map(e=>`<button class="evi" data-c="${e.code}"><span class="mono">${e.code}</span><b>${esc(e.name)}</b><span>活動 ${e.pS} ~ ${e.pE}</span>${stTag(actState(e))}</button>`).join('')}</div>`+(u().lines?`<div class="note">只列出您負責線別的變價活動。</div>`:'');
         ft.innerHTML='';bd.querySelectorAll('.evi').forEach(b=>b.onclick=()=>me.byEvent(b.dataset.c));
       $('tP').onclick=()=>{me.mode='prod';me.start()};$('tE').onclick=()=>{me.mode='ev';me.start()};}
     },
     byProduct(t,v){const me=this;const r=findProduct(t,v);const list=r.p?pcsOf(r.p):[];
-      const res=r.err||{http:200,body:{success:true,data:{pxNo:r.p.px,count:list.length,items:list.map(x=>({eventCode:x.ev,eventName:evBy(x.ev).name,priceChangeStatus:x.status,startDate:evBy(x.ev).pS,endDate:evBy(x.ev).pE,marketPrice:x.market,salePrice:x.price,takeType:x.take,saleStores:x.sale,pickupStores:x.pick,limitQty:x.limit}))}}};
-      call({title:'查詢特賣',steps:[`送出 ${KT[t].label} ${v}`,'小露轉送 B2E','B2E 檢核權限','取得變價活動'],liffReq:'POST /liff-api/sale-query\n'+JSON.stringify({queryType:KT[t].key,queryValue:v},null,2),b2eReq:hdr('price-changes/query',{queryType:KT[t].key,queryValue:v,employeeNo:u().emp}),res,
+      const res=r.err||{http:200,body:{success:true,data:{pxNo:r.p.px,total:list.length,limit:LIMIT,items:list.slice(0,LIMIT).map(x=>({eventCode:x.ev,eventName:evBy(x.ev).name,priceChangeStatus:PCODE[x.status],priceChangeStatusName:x.status,startDate:evBy(x.ev).pS,endDate:evBy(x.ev).pE,marketPrice:x.market,salePrice:x.price,takeType:x.take,saleStores:x.sale,pickupStores:x.pick,limitQty:x.limit}))}}};
+      call({title:'查詢特賣',steps:[`送出 ${KT[t].label} ${v}`,'小露轉送 B2E','B2E 檢核權限','取得變價活動'],liffReq:'POST /liff-api/sale-query\n'+JSON.stringify({queryType:KT[t].key,queryValue:v},null,2),b2eReq:hdr('price-changes/query',{queryType:KT[t].key,queryValue:v,statuses:[1,2,4,10],limit:LIMIT,sort:'activityStart desc',employeeNo:u().emp}),res,
         onDone:res=>{if(res.http!==200)return errBox(res,()=>me.start());me.showProduct(r.p)}});
     },
-    showProduct(p){const me=this;setHead('特賣活動',()=>{me.mode='prod';me.start()});const list=pcsOf(p);
-      bd.innerHTML=pHead(p)+`<span class="lbl">變價活動 ${list.length} 筆（點選看明細）</span>`+(list.length?`<div class="pclist">${list.map(x=>`<button class="pci" data-id="${x.id}"><div class="r1">${pcBadge(x.status)}<b>${esc(evBy(x.ev).name)}</b><span class="mono">${x.ev}</span></div><div class="r2"><span>${evBy(x.ev).pS} ~ ${evBy(x.ev).pE}</span><span class="pr"><s>$${fmt(x.market)}</s> <b>$${fmt(x.price)}</b></span></div><div class="r3"><span>${x.take}</span><span>${esc(x.sale)}</span><span>限量 ${x.limit??'(未設定)'}</span></div></button>`).join('')}</div>`:'<div class="noimg">此商品尚無變價活動</div>');
+    showProduct(p){const me=this;setHead('特賣活動',()=>{me.mode='prod';me.start()});const all=pcsOf(p),list=all.slice(0,LIMIT);
+      bd.innerHTML=pHead(p)+`<span class="lbl">變價活動 共 ${all.length} 筆${all.length>LIMIT?'，顯示近期 '+LIMIT+' 筆':''}（點選看明細）</span>`+(list.length?`<div class="pclist">${list.map(x=>`<button class="pci" data-id="${x.id}"><div class="r1">${pcBadge(x.status)}${lockTag(x)}<b>${esc(evBy(x.ev).name)}</b><span class="mono">${x.ev}</span></div><div class="r2"><span>${evBy(x.ev).pS} ~ ${evBy(x.ev).pE}</span><span class="pr"><s>$${fmt(x.market)}</s> <b>$${fmt(x.price)}</b></span></div><div class="r3"><span>${x.take}</span><span>${esc(x.sale)}</span><span>限量 ${x.limit??'(未設定)'}</span></div></button>`).join('')}</div>`:'<div class="noimg">此商品尚無變價活動</div>');
       ft.innerHTML=`<button class="btn sec" id="b1">再查一筆</button>${role==='buyer'?'<button class="btn pri" id="b2">代理加減量</button>':''}`;
       $('b1').onclick=()=>{me.mode='prod';me.start()};if($('b2'))$('b2').onclick=()=>{app='代理加減量';APPS['代理加減量'].form(p)};
       bd.querySelectorAll('.pci').forEach(b=>b.onclick=()=>me.detail(PCS.find(x=>x.id===b.dataset.id),()=>me.showProduct(p)));
     },
-    byEvent(c){const me=this;const e=evBy(c);const list=PCS.filter(x=>x.ev===c&&(!u().lines||lineOk(byPf(x.pf))));
-      call({title:'查詢特賣',steps:[`送出檔期 ${c}`,'小露轉送 B2E','B2E 依線別過濾','取得變價活動'],liffReq:'POST /liff-api/sale-query\n'+JSON.stringify({eventCode:c},null,2),b2eReq:hdr('price-changes/query',{eventCode:c,employeeNo:u().emp,page:1,pageSize:20}),
-        res:{http:200,body:{success:true,data:{eventCode:c,total:list.length,page:1,pageSize:20,items:list.slice(0,20).map(x=>({pxNo:x.px,priceChangeStatus:x.status,salePrice:x.price}))}}},
+    byEvent(c){const me=this;const e=evBy(c);const list=PCS.filter(x=>x.ev===c&&(!u().lines||lineOk(byPf(x.pf)))).sort(recent);
+      call({title:'查詢特賣',steps:[`送出檔期 ${c}`,'小露轉送 B2E','B2E 依線別過濾','取得變價活動'],liffReq:'POST /liff-api/sale-query\n'+JSON.stringify({eventCode:c},null,2),b2eReq:hdr('price-changes/query',{eventCode:c,statuses:[1,2,4,10],limit:LIMIT,sort:'activityStart desc',employeeNo:u().emp}),
+        res:{http:200,body:{success:true,data:{eventCode:c,total:list.length,limit:LIMIT,items:list.slice(0,LIMIT).map(x=>({pxNo:x.px,priceChangeStatus:PCODE[x.status],priceChangeStatusName:x.status,salePrice:x.price}))}}},
         onDone:()=>{setHead(e.name,()=>{me.mode='ev';me.start()});
-          const page=list.slice(0,20);
-          bd.innerHTML=`<div class="evh"><span class="mono">${e.code}</span><b>${esc(e.name)}</b><span>變價 ${e.pS} ~ ${e.pE}</span><span class="evs ${evState(e)}">${evState(e)}</span></div><span class="lbl">共 ${list.length} 筆${list.length>20?'，顯示前 20 筆':''}</span><div class="pclist">${page.map(x=>{const p=byPf(x.pf);return `<button class="pci" data-id="${x.id}"><div class="r1">${pcBadge(x.status)}<b>${esc(p.salesName)}</b></div><div class="r2"><span class="mono">${p.px}</span><span class="pr"><s>$${fmt(x.market)}</s> <b>$${fmt(x.price)}</b></span></div><div class="r3"><span>${x.take}</span><span>可銷量 ${fmt(p.avail)}</span><span>限量 ${x.limit??'(未設定)'}</span></div></button>`}).join('')}</div>`;
+          const page=list.slice(0,LIMIT);
+          bd.innerHTML=`<div class="evh"><span class="mono">${e.code}</span><b>${esc(e.name)}</b><span>活動 ${e.pS} ~ ${e.pE}</span>${stTag(actState(e))}</div><span class="lbl">共 ${list.length} 筆${list.length>LIMIT?'，顯示近期 '+LIMIT+' 筆':''}</span><div class="pclist">${page.map(x=>{const p=byPf(x.pf);return `<button class="pci" data-id="${x.id}"><div class="r1">${pcBadge(x.status)}${lockTag(x)}<b>${esc(p.salesName)}</b></div><div class="r2"><span class="mono">${p.px}</span><span class="pr"><s>$${fmt(x.market)}</s> <b>$${fmt(x.price)}</b></span></div><div class="r3"><span>${x.take}</span><span>可銷量 ${fmt(p.avail)}</span><span>限量 ${x.limit??'(未設定)'}</span></div></button>`}).join('')}</div>`;
           ft.innerHTML=`<button class="btn sec" id="b1">換檔期</button>`;$('b1').onclick=()=>{me.mode='ev';me.start()};
           bd.querySelectorAll('.pci').forEach(b=>b.onclick=()=>me.detail(PCS.find(x=>x.id===b.dataset.id),()=>me.byEvent(c)));}});
     },
     detail(x,back){const p=byPf(x.pf),e=evBy(x.ev);setHead('變價明細',back);
       bd.innerHTML=pHead(p)+kvRows([['變價狀態',pcBadge(x.status),'raw'],['檔期',e.code+' '+e.name,'txt'],['活動起迄',e.pS+' ~ '+e.pE],null,['原價/市價','$'+fmt(x.market)],['活動售價','$'+fmt(x.price),'big'],['N特',x.nte.length?x.nte.map(n=>n.n+' 組 $'+fmt(n.price)).join('、'):'—','txt'],null,
         ['提貨方式',x.take,'txt'],['銷售門市',x.sale,'txt'],['取貨門市',x.pick,'txt'],['提貨起迄',x.take==='門市'?x.tS+' ~ '+x.tE:'—（宅配由系統計算）','txt'],['出貨',x.ship,'txt'],['限制數量',x.limit??'(未設定)'],['目前可銷量',fmt(p.avail)],null,['活動銷售碼',x.saleCode],['紙本訂購碼',x.sno]])+`<div class="note">成本、折讓不顯示。要修改活動欄位請至 B2E「全聯預購變價異動」。</div>`;
-      ft.innerHTML=`<button class="btn sec" id="b1">返回</button>${role==='buyer'&&(x.status==='待生效'||x.status==='已變價')?'<button class="btn danger" id="b2">鎖檔</button>':''}`;
+      ft.innerHTML=`<button class="btn sec" id="b1">返回</button>${role==='buyer'&&canLock(x)?'<button class="btn danger" id="b2">鎖檔</button>':''}`;
       $('b1').onclick=back;if($('b2'))$('b2').onclick=()=>{app='活動鎖檔';APPS['活動鎖檔'].confirm([x],back)};
     }
   };
@@ -582,7 +608,7 @@ ol.rules{margin:0;padding-left:20px;display:grid;gap:6px}
       const r=findProduct(t,v);if(r.err){return call({title:'代理加減量',steps:[`送出 ${KT[t].label} ${v}`,'小露轉送 B2E','B2E 檢核權限','—'],liffReq:'POST /liff-api/purchase-adjust/precheck\n'+JSON.stringify({queryType:KT[t].key,queryValue:v},null,2),b2eReq:hdr('purchase-adjustments/precheck',{queryType:KT[t].key,queryValue:v,employeeNo:u().emp}),res:r.err,onDone:res=>errBox(res,()=>this.start())})}
       this.form(r.p)}})},
     form(p,st){const me=this;st=st||{type:'+',qty:'',reason:''};setHead('代理加減量',()=>me.start());
-      const s7=Math.round(p.avail*0.04+(h(p.pf)%30)),s30=s7*4+h(p.px)%40,lim=pcsOf(p).find(x=>x.status!=='已過期'&&x.limit);
+      const s7=Math.round(p.avail*0.04+(h(p.pf)%30)),s30=s7*4+h(p.px)%40,lim=pcsOf(p).find(x=>canLock(x)&&x.limit);
       function calc(){const q=+st.qty||0;const after=st.type==='+'?p.avail+q:p.avail-q;return after}
       bd.innerHTML=pHead(p)+kvRows([['供應商',p.sup+' '+p.supName,'txt'],['目前可銷量',fmt(p.avail),'big'],['7日內銷量',fmt(s7)],['30日內銷量',fmt(s30)],['進行中限制數量',lim?lim.limit+'（'+evBy(lim.ev).name+'）':'(未設定)','txt']])+`
         <div><span class="lbl">加減類型</span><div class="tabs"><button id="tA" aria-pressed="${st.type==='+'}">加量</button><button id="tM" aria-pressed="${st.type==='-'}">減量</button></div></div>
@@ -590,7 +616,7 @@ ol.rules{margin:0;padding-left:20px;display:grid;gap:6px}
         <div class="keypad sm" id="kp">${[1,2,3,4,5,6,7,8,9].map(n=>`<button type="button" data-n="${n}">${n}</button>`).join('')}<button type="button" class="fn" data-n="C">清除</button><button type="button" data-n="0">0</button><button type="button" class="fn" data-n="B">⌫</button></div>
         <div><span class="lbl">申請原因</span><div class="chips" id="rs">${REASONS.map(r=>`<button aria-pressed="${st.reason===r}">${r}</button>`).join('')}</div></div>
         <div class="pv" id="pv"></div>
-        <div class="note"><b>注意事項</b><br>1. 依核可當下的庫存加減量；減量大於目前庫存時，庫存減為 0。<br>2. 庫存為線上、線下共用。<br>3. 提品變價已設定限制數量時，會自動重置數量。</div>`;
+        <div class="note"><b>注意事項</b><br>1. 依核可當下的庫存加減量；減量大於目前庫存時，庫存減為 0。<br>2. 庫存為線上、線下共用。<br>3. 此作業用於當下追加或調整可銷量，不影響提品變價的限制數量。</div>`;
       ft.innerHTML=`<button class="btn pri" id="go" disabled>代理送審（自動核可）</button>`;
       function upd(){$('qq').value=st.qty;const a=calc(),q=+st.qty||0;$('pv').innerHTML=q?`核可後可銷量（預估）<b class="${a<=0?'zero':''}">${a<=0?'0　將歸零（申請 '+st.type+q+'）':fmt(a)}</b>`:'';$('go').disabled=!(q>0&&st.reason)}
       $('tA').onclick=()=>{st.type='+';me.form(p,st)};$('tM').onclick=()=>{st.type='-';me.form(p,st)};
@@ -613,15 +639,15 @@ ol.rules{margin:0;padding-left:20px;display:grid;gap:6px}
 
   /* ---------- 4. 活動鎖檔 ---------- */
   APPS['活動鎖檔']={
-    start(){const me=this;setHead('活動鎖檔');const list=EVENTS.filter(e=>['進行中','提品中','未開始'].includes(evState(e)));
-      bd.innerHTML=idBadge()+`<span class="lbl">選擇檔期（只列進行中與未來檔期）</span><div class="evlist">${list.map(e=>{const n=PCS.filter(x=>x.ev===e.code&&lineOk(byPf(x.pf))&&['待生效','已變價'].includes(x.status)).length;return `<button class="evi" data-c="${e.code}"><span class="mono">${e.code}</span><b>${esc(e.name)}</b><span>${e.pS} ~ ${e.pE}・可鎖 ${n} 筆</span><span class="evs ${evState(e)}">${evState(e)}</span></button>`}).join('')}</div>
+    start(){const me=this;setHead('活動鎖檔');const list=EVENTS.filter(e=>actState(e)!=='活動已過期');
+      bd.innerHTML=idBadge()+`<span class="lbl">選擇檔期（只列活動進行中與未開始的檔期）</span><div class="evlist">${list.map(e=>{const n=PCS.filter(x=>x.ev===e.code&&lineOk(byPf(x.pf))&&canLock(x)).length;return `<button class="evi" data-c="${e.code}"><span class="mono">${e.code}</span><b>${esc(e.name)}</b><span>活動 ${e.pS} ~ ${e.pE}・可鎖 ${n} 筆</span>${stTag(actState(e))}</button>`}).join('')}</div>
         <div class="note">鎖檔＝讓變價失效。全電商活動立即失效；線下門市隔天失效（待 POS 同步）。</div>`;
       ft.innerHTML=`<button class="btn sec" id="b1">改用商品編號</button>`;$('b1').onclick=()=>productPicker({title:'活動鎖檔',btn:'查詢可鎖檔變價',back:()=>me.start(),hint:'查詢此商品可鎖檔的變價活動',samples:[byPf('00441107'),byPf('00473447'),byPf('00051231')],onSubmit:(t,v)=>{const r=findProduct(t,v);if(r.err)return call({title:'活動鎖檔',steps:['送出編號','小露轉送 B2E','B2E 檢核權限','—'],liffReq:'POST /liff-api/price-lock/query',b2eReq:hdr('price-changes/query',{queryType:KT[t].key,queryValue:v,lockable:true,employeeNo:u().emp}),res:r.err,onDone:res=>errBox(res,()=>me.start())});me.pick(pcsOf(r.p),'商品 '+r.p.px,()=>me.start())}});
       bd.querySelectorAll('.evi').forEach(b=>b.onclick=()=>{const c=b.dataset.c;me.pick(PCS.filter(x=>x.ev===c&&lineOk(byPf(x.pf))),evBy(c).name,()=>me.start())});
     },
     pick(list,title,back){const me=this;setHead('選擇要鎖檔的變價',back);const sel=new Set();
-      const lockable=list.filter(x=>['待生效','已變價'].includes(x.status)),others=list.filter(x=>!lockable.includes(x));
-      bd.innerHTML=`<span class="lbl">${esc(title)}｜可鎖 ${lockable.length} 筆${lockable.length>15?'，顯示前 15 筆':''}</span><div class="pclist">${lockable.slice(0,15).map(x=>{const p=byPf(x.pf);return `<label class="pci ck"><input type="checkbox" value="${x.id}"><div><div class="r1">${pcBadge(x.status)}<b>${esc(p.salesName)}</b></div><div class="r2"><span class="mono">${p.px}・${x.ev}</span><span class="pr">$${fmt(x.price)}</span></div></div></label>`}).join('')||'<div class="noimg">沒有可鎖檔的變價</div>'}</div>`+(others.length?`<details class="smp"><summary>不可鎖檔 ${others.length} 筆（已鎖檔／已過期）</summary><div class="pclist">${others.slice(0,10).map(x=>`<div class="pci dis"><div class="r1">${pcBadge(x.status)}<b>${esc(byPf(x.pf).salesName)}</b></div></div>`).join('')}</div></details>`:'');
+      const lockable=list.filter(canLock);
+      bd.innerHTML=`<span class="lbl">${esc(title)}｜可鎖 ${lockable.length} 筆${lockable.length>15?'，顯示前 15 筆':''}（只列 1 待生效、2 已變價）</span><div class="pclist">${lockable.slice(0,15).map(x=>{const p=byPf(x.pf);return `<label class="pci ck"><input type="checkbox" value="${x.id}"><div><div class="r1">${pcBadge(x.status)}<b>${esc(p.salesName)}</b></div><div class="r2"><span class="mono">${p.px}・${x.ev}</span><span class="pr">$${fmt(x.price)}</span></div></div></label>`}).join('')||'<div class="noimg">沒有可鎖檔的變價</div>'}</div>`;
       ft.innerHTML=`<button class="btn danger" id="go" disabled>鎖檔（0）</button>`;
       bd.querySelectorAll('input[type=checkbox]').forEach(c=>c.onchange=()=>{c.checked?sel.add(c.value):sel.delete(c.value);$('go').disabled=!sel.size;$('go').textContent=`鎖檔（${sel.size}）`});
       $('go').onclick=()=>me.confirm([...sel].map(id=>PCS.find(x=>x.id===id)),()=>me.pick(list,title,back));
@@ -636,9 +662,9 @@ ol.rules{margin:0;padding-left:20px;display:grid;gap:6px}
     submit(items,reason){const me=this;const body={priceChangeIds:items.map(x=>x.id),reason,employeeNo:u().emp};
       call({title:'活動鎖檔',labels:['LIFF 送出鎖檔','小露 帶員編＋冪等鍵','B2E 權限＋線別檢核','B2E 鎖檔 同步 ERP','LIFF 呈現結果'],steps:['送出鎖檔','小露轉送 B2E','B2E 重查身份與線別','鎖檔並同步 ERP／POS'],
         liffReq:'POST /liff-api/price-lock\n'+JSON.stringify({priceChangeIds:body.priceChangeIds,reason},null,2),b2eReq:hdr('price-changes/lock',body).replace('X-Line-User-Id','Idempotency-Key: idem-'+Date.now().toString(36)+'\nX-Line-User-Id'),
-        res:{http:200,body:{success:true,data:{locked:items.length,results:items.map(x=>({id:x.id,status:'LOCKED',onlineEffective:'IMMEDIATE',storeEffective:addDays(TODAY,1)}))}}},
-        onDone:()=>{items.forEach(x=>x.status='已鎖檔');setHead('鎖檔完成',null);
-          bd.innerHTML=`<div class="okbox"><div class="ok-ic">✓</div><b>已鎖檔 ${items.length} 筆</b><span>全電商已失效；門市 ${addDays(TODAY,1)} 失效</span></div><div class="pclist">${items.map(x=>`<div class="pci"><div class="r1">${pcBadge('已鎖檔')}<b>${esc(byPf(x.pf).salesName)}</b></div><div class="r2"><span class="mono">${x.px}・${x.ev}</span></div></div>`).join('')}</div>`;
+        res:{http:200,body:{success:true,data:{locked:items.length,results:items.map(x=>({id:x.id,priceChangeStatus:10,priceChangeStatusName:'已中止',onlineEffective:'IMMEDIATE',storeEffective:addDays(TODAY,1)}))}}},
+        onDone:()=>{items.forEach(x=>x.status='已中止');setHead('鎖檔完成',null);
+          bd.innerHTML=`<div class="okbox"><div class="ok-ic">✓</div><b>已鎖檔 ${items.length} 筆</b><span>全電商已失效；門市 ${addDays(TODAY,1)} 失效</span></div><div class="pclist">${items.map(x=>`<div class="pci"><div class="r1">${pcBadge(x.status)}<b>${esc(byPf(x.pf).salesName)}</b></div><div class="r2"><span class="mono">${x.px}・${x.ev}</span></div></div>`).join('')}</div>`;
           ft.innerHTML=`<button class="btn sec" id="b1">繼續鎖檔</button><button class="btn pri" id="b2">完成</button>`;$('b1').onclick=()=>me.start();
           $('b2').onclick=()=>{closeLiff();setTimeout(()=>card('活動鎖檔 · '+now(),`<b>已鎖檔 ${items.length} 筆</b><span>原因：${esc(reason)}</span><span>門市 ${addDays(TODAY,1)} 失效</span>`),300)}}});
     }
@@ -649,20 +675,26 @@ ol.rules{margin:0;padding-left:20px;display:grid;gap:6px}
     f:'全部',
     start(){const me=this;
       call({title:'全聯檔期',labels:['LIFF 開啟','小露 帶員編轉送','B2E 權限檢核','B2E 讀取檔期','LIFF 呈現'],steps:['讀取行銷檔期','小露轉送 B2E','B2E 檢核權限','取得檔期清單'],liffReq:'GET /liff-api/event-calendar',b2eReq:hdr('marketing-events?from=2026-07-01&to=2027-06-30&employeeNo='+u().emp,null,'GET'),
-        res:{http:200,body:{success:true,data:EVENTS.map(e=>({eventCode:e.code,eventName:e.name,priceStart:e.pS,priceEnd:e.pE,submitStart:e.sS,submitEnd:e.sE,openForSubmit:e.open,state:evState(e)}))}},onDone:()=>me.list()});
+        res:{http:200,body:{success:true,data:EVENTS.map(e=>({eventCode:e.code,eventName:e.name,activityStart:e.pS,activityEnd:e.pE,registerStart:e.sS,registerEnd:e.sE,registerState:regState(e),activityState:actState(e)}))}},onDone:()=>me.list()});
     },
-    list(){const me=this;setHead('全聯檔期');const FS=['全部','提品中','進行中','未開始','已結束'];
-      const L=EVENTS.filter(e=>me.f==='全部'||evState(e)===me.f);
-      bd.innerHTML=`<div class="chips" id="fs">${FS.map(x=>`<button aria-pressed="${x===me.f}">${x}</button>`).join('')}</div>
-        <div class="tl">${L.map(e=>{const s=evState(e);const mine=PCS.filter(x=>x.ev===e.code&&lineOk(byPf(x.pf))).length;return `<button class="tli" data-c="${e.code}"><span class="evs ${s}">${s}</span><div><b>${esc(e.name)}</b> <span class="mono">${e.code}</span><div class="bar"><span>變價 ${e.pS} ~ ${e.pE}</span></div><div class="sub">提品 ${e.sS} ~ ${e.sE}・${e.open?'<span class="open">開放提品</span>':'未開放提品'}${role==='buyer'?'・我的變價 '+mine+' 筆':''}</div></div></button>`}).join('')||'<div class="noimg">沒有符合的檔期</div>'}</div>
-        <div class="note">只提供查詢；調整提品期間、開放提品請至 B2E「全聯行銷檔期」。</div>`;
-      ft.innerHTML='';bd.querySelectorAll('#fs button').forEach(b=>b.onclick=()=>{me.f=b.textContent;me.list()});
+    fr:'全部',fa:'全部',
+    list(){const me=this;setHead('全聯檔期');
+      const FR=['全部','報名進行中','報名未開始','報名已結束'],FA=['全部','活動進行中','活動未開始','活動已過期'];
+      const L=EVENTS.filter(e=>(me.fr==='全部'||regState(e)===me.fr)&&(me.fa==='全部'||actState(e)===me.fa));
+      bd.innerHTML=`<div class="frow"><span>報名</span><div class="chips" id="fr">${FR.map(x=>`<button aria-pressed="${x===me.fr}">${x.replace('報名','')||x}</button>`).join('')}</div></div>
+        <div class="frow"><span>活動</span><div class="chips" id="fa">${FA.map(x=>`<button aria-pressed="${x===me.fa}">${x.replace('活動','')||x}</button>`).join('')}</div></div>
+        <div class="tl">${L.map(e=>{const mine=PCS.filter(x=>x.ev===e.code&&lineOk(byPf(x.pf))).length;return `<button class="tli" data-c="${e.code}"><div><b>${esc(e.name)}</b> <span class="mono">${e.code}</span>
+          <div class="dl"><span>活動起迄</span>${e.pS} ~ ${e.pE}</div><div class="dl"><span>報名起迄</span>${e.sS} ~ ${e.sE}</div>${evTags(e)}${role==='buyer'?`<div class="sub">我的變價 ${mine} 筆</div>`:''}</div></button>`}).join('')||'<div class="noimg">沒有符合的檔期</div>'}</div>
+        <div class="note">只提供查詢；調整報名起迄請至 B2E「全聯行銷檔期」。</div>`;
+      ft.innerHTML='';
+      bd.querySelectorAll('#fr button').forEach((b,i)=>b.onclick=()=>{me.fr=FR[i];me.list()});
+      bd.querySelectorAll('#fa button').forEach((b,i)=>b.onclick=()=>{me.fa=FA[i];me.list()});
       bd.querySelectorAll('.tli').forEach(b=>b.onclick=()=>me.detail(evBy(b.dataset.c)));
     },
-    detail(e){const me=this;setHead(e.name,()=>me.list());const s=evState(e);const all=PCS.filter(x=>x.ev===e.code),mine=all.filter(x=>lineOk(byPf(x.pf)));
-      const cnt=a=>['待生效','已變價','已鎖檔','已過期'].map(k=>[k,a.filter(x=>x.status===k).length]).filter(x=>x[1]);
-      bd.innerHTML=kvRows([['檔期代碼',e.code],['檔期名稱',e.name,'txt'],['檔期狀態',`<span class="evs ${s}">${s}</span>`,'raw'],['變價期間',e.pS+' ~ '+e.pE],['提品期間',e.sS+' ~ '+e.sE],['開放提品',e.open?'是（廠商可於 SCM 提報）':'否','txt']])+
-        `<span class="lbl">${role==='buyer'?'我負責線別的變價':'本檔期變價'}（${(role==='buyer'?mine:all).length} 筆）</span><div class="chips st">${cnt(role==='buyer'?mine:all).map(([k,n])=>pcBadge(k)+' '+n).join('　')||'—'}</div>`;
+    detail(e){const me=this;setHead(e.name,()=>me.list());const all=PCS.filter(x=>x.ev===e.code),mine=all.filter(x=>lineOk(byPf(x.pf)));
+      const cnt=a=>Object.keys(PCODE).map(k=>[k,a.filter(x=>x.status===k).length]).filter(x=>x[1]);const lk=()=>0;
+      bd.innerHTML=kvRows([['檔期代碼',e.code],['檔期名稱',e.name,'txt'],['活動起迄',e.pS+' ~ '+e.pE],['報名起迄',e.sS+' ~ '+e.sE],['報名狀態',stTag(regState(e)),'raw'],['活動狀態',stTag(actState(e)),'raw']])+
+        `<span class="lbl">${role==='buyer'?'我負責線別的變價':'本檔期變價'}（${(role==='buyer'?mine:all).length} 筆）</span><div class="chips st">${cnt(role==='buyer'?mine:all).map(([k,n])=>pcBadge(k)+' '+n).join('　')||'—'}${lk(role==='buyer'?mine:all)?'　<span class="lk">鎖檔</span> '+lk(role==='buyer'?mine:all):''}</div>`;
       ft.innerHTML=`<button class="btn sec" id="b1">返回</button><button class="btn pri" id="b2">查看變價活動</button>`;$('b1').onclick=()=>me.list();
       $('b2').onclick=()=>{app='查詢特賣';APPS['查詢特賣'].byEvent(e.code)};
     }
@@ -673,18 +705,18 @@ ol.rules{margin:0;padding-left:20px;display:grid;gap:6px}
     f:'待回覆',
     start(){const me=this;
       call({title:'商談回覆',labels:['LIFF 開啟','小露 帶員編轉送','B2E 權限檢核','B2E 讀取商談','LIFF 呈現'],steps:['讀取商談','小露轉送 B2E','B2E 檢核權限','取得指派給您的商談'],liffReq:'GET /liff-api/inquiries',b2eReq:hdr('inquiries?assignee='+u().emp+'&status=PENDING,REPLIED,CLOSED',null,'GET'),
-        res:{http:200,body:{success:true,data:INQ.map(x=>({inquiryNo:x.id,supplier:x.sup,category:x.cat+'/'+x.sub,subject:x.subject,status:x.st,unread:x.unread,createdAt:x.time}))}},onDone:()=>me.list()});
+        res:{http:200,body:{success:true,data:INQ.map(x=>({inquiryNo:x.id,supplier:x.sup,originType:({'子單':'ORDER','商品':'PRODUCT','功能':'FUNCTION'})[x.unit.t],originValue:x.unit.v,topic:x.topic,subject:x.subject,status:x.st,unread:x.unread,createdAt:x.time}))}},onDone:()=>me.list()});
     },
     list(){const me=this;setHead('商談回覆');const FS=['待回覆','已回覆','已結案','全部'];
       const L=INQ.filter(x=>me.f==='全部'||x.st===me.f);
       bd.innerHTML=`<div class="chips" id="fs">${FS.map(x=>`<button aria-pressed="${x===me.f}">${x}（${x==='全部'?INQ.length:INQ.filter(i=>i.st===x).length}）</button>`).join('')}</div>
-        <div class="iql">${L.map(x=>`<button class="iqi" data-id="${x.id}"><div class="r1"><span class="iqs ${x.st}">${x.st}</span>${x.unread?'<span class="dot"></span>':''}<b>${esc(x.subject)}</b></div><div class="r2"><span>${esc(x.sup)}</span><span>${x.cat}／${x.sub}</span></div><div class="r3"><span class="mono">${x.id}</span><span>${x.time}</span></div></button>`).join('')||'<div class="noimg">沒有符合的商談</div>'}</div>`;
+        <div class="iql">${L.map(x=>`<button class="iqi" data-id="${x.id}"><div class="r1"><span class="iqs ${x.st}">${x.st}</span>${x.unread?'<span class="dot"></span>':''}<b>${esc(x.subject)}</b></div><div class="r2"><span class="unit u-${x.unit.t}">${esc(unitTxt(x))}</span><span>${esc(x.sup)}</span><span>${esc(x.topic)}</span></div><div class="r3"><span class="mono">${x.id}</span><span>${x.time}</span></div></button>`).join('')||'<div class="noimg">沒有符合的商談</div>'}</div>`;
       ft.innerHTML='';bd.querySelectorAll('#fs button').forEach(b=>b.onclick=()=>{me.f=b.textContent.replace(/（.*/,'');me.list()});
       bd.querySelectorAll('.iqi').forEach(b=>b.onclick=()=>me.thread(INQ.find(x=>x.id===b.dataset.id)));
     },
     thread(x){const me=this;x.unread=false;setHead('商談 '+x.id.slice(-6),()=>me.list());const p=x.pf?byPf(x.pf):null;
       const closed=x.st==='已結案';
-      bd.innerHTML=`<div class="iqh"><b>${esc(x.subject)}</b><span>${esc(x.sup)}・${x.cat}／${x.sub}</span><span>關聯${x.ref.t}：${esc(x.ref.v)}</span><span class="iqs ${x.st}">${x.st}</span></div>
+      bd.innerHTML=`<div class="iqh"><b>${esc(x.subject)}</b><span>${esc(x.sup)}・${esc(x.topic)}</span><span>商談類型：<span class="unit u-${x.unit.t}">${esc(unitTxt(x))}</span></span><span class="iqs ${x.st}">${x.st}</span></div>
         ${p?`<button class="pmini" id="pm">${p.img?`<img src="${p.img}" alt="">`:''}<span>${esc(p.salesName)}<br><span class="mono">${p.px}・可銷量 ${fmt(p.avail)}</span></span><span>›</span></button>`:''}
         <div class="th">${x.msgs.map(m=>`<div class="tm ${m.who==='採購'?'me':m.who==='系統'?'sys':''}"><span class="who">${esc(m.name)}・${m.t}</span><div>${esc(m.txt)}</div></div>`).join('')}</div>
         ${closed?'<div class="note">此商談已結案，無法再回覆。</div>':`<div><span class="lbl">快速片語</span><div class="chips" id="qp">${['已收到，確認後回覆您','同意，請依說明辦理','請補充相關資料','此需求無法同意'].map(t=>`<button>${t}</button>`).join('')}</div>
